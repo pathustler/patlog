@@ -1,41 +1,83 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+// app/blog/[topic]/page.tsx
+import { notFound } from 'next/navigation';
 import {
   Author,
   BlogMdxFrontmatter,
   getAllBlogsFrontmatter,
 } from "@/lib/markdown";
 import { formatDate2, stringToDate } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Patlogs",
-};
 
-export default async function BlogIndexPage() {
+
+
+export default async function TopicPage({ params }: { params: { topic: string } }) {
+  const { topic } = params;
+  console.log(topic)
+
+  // Simulate fetching from a DB, CMS, or wherever the hell your content lives
   const blogs = (await getAllBlogsFrontmatter()).sort(
-    (a, b) => stringToDate(b.date).getTime() - stringToDate(a.date).getTime()
-  );
+      (a, b) => stringToDate(b.date).getTime() - stringToDate(a.date).getTime()
+    );
+
+  type TopicKey = {
+  [key: string]: string;
+}
+ 
+  const topickey:TopicKey = {
+    "Software Development":"software",
+    "ML Development":"ml"
+  }
+  const filtered = blogs.filter(blog => topickey[blog.topic] === topic);
+
+  if (filtered.length === 0) notFound(); // throw 404 if topic is empty
+  const grouped = groupByProject(filtered);
+
+
+  
 
   return (
-    <div className="flex flex-col gap-1 sm:min-h-[91vh] min-h-[88vh] pt-2">
-      <div className="mb-7 flex flex-col gap-2">
-        <h1 className="sm:text-3xl text-2xl font-extrabold">
-          The latest blogs of this product
-        </h1>
-        <p className="text-muted-foreground sm:text-[16.5px] text-[14.5px]">
-          All the latest blogs and news, straight from the team.
-        </p>
-      </div>
-      <div className="grid md:grid-cols-3 sm:grid-cols-2 grid-cols-1 sm:gap-8 gap-4 mb-5">
+     <div className="flex flex-col gap-1 sm:min-h-[91vh] min-h-[88vh] pt-2">
+      
+      {Object.entries(grouped).map(([projectName, blogs]) => (
+        <>
+        <h1 className="sm:text-3xl text-2xl font-extrabold">{projectName}</h1>
+      <div className="grid md:grid-cols-3 sm:grid-cols-2 grid-cols-1 sm:gap-8 gap-4 my-5">
         {blogs.map((blog) => (
           <BlogCard {...blog} slug={blog.slug} key={blog.slug} />
         ))}
       </div>
-    </div>
+      <br></br>
+      <hr></hr>
+      <br></br>
+      </>
+      ))}
+    </div> 
   ); 
 }
+
+type Blog = {
+    date:string,
+  title:string,
+  description:string,
+  topic:string,
+  project:string,
+  slug:string,
+  cover: string,
+  authors:Author[],
+  };
+
+  function groupByProject(blogs: Blog[]) {
+  return blogs.reduce((acc, blog) => {
+    if (!acc[blog.project]) acc[blog.project] = [];
+    acc[blog.project].push(blog);
+    return acc;
+  }, {} as Record<string, Blog[]>);
+}
+
 
 function BlogCard({
   date,
@@ -52,7 +94,7 @@ function BlogCard({
       href={`/blog/${slug}`}
       className="flex flex-col gap-2 items-start border rounded-md py-5 px-3 min-h-[400px]"
     >
-      <h3 className="text-md font-semibold -mt-1 pr-7">{title} - {topic}</h3>
+      <h3 className="text-md font-semibold -mt-1 pr-7">{title}</h3>
       <div className="w-full">
         <Image
           src={cover}
@@ -63,7 +105,7 @@ function BlogCard({
           className="w-full rounded-md object-cover h-[180px] border"
         />
       </div>
-      <p className="text-sm text-muted-foreground">{project} - {description}</p>
+      <p className="text-sm text-muted-foreground">{description}</p>
       <div className="flex items-center justify-between w-full mt-auto">
         <p className="text-[13px] text-muted-foreground">
           Published on {formatDate2(date)}

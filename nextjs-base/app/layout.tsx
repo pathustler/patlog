@@ -20,10 +20,10 @@ const monoFont = Space_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AriaDocs - Template",
-  metadataBase: new URL("https://ariadocs.vercel.app/"),
+  title: "Patlog - Personal Documentation Site",
+  metadataBase: new URL("https://patlog.vercel.app/"),
   description:
-    "This comprehensive documentation template, crafted with Next.js and available as open-source, delivers a sleek and responsive design, tailored to meet all your project documentation requirements.",
+    "Patlog is a personal documentation site that showcases my projects, articles, and blog posts.",
 };
 
 export default function RootLayout({
@@ -39,6 +39,7 @@ export default function RootLayout({
           type="text/css"
           href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
         />
+        <link rel="icon" href="/images/doc.png" type="image/x-icon"/>
       </head>
       <body
         className={`${sansFont.variable} ${monoFont.variable} font-regular antialiased tracking-wide`}
@@ -54,7 +55,7 @@ export default function RootLayout({
           <main className="sm:container mx-auto w-[90vw] h-auto scroll-smooth">
             {children}
           </main>
-          <Footer />
+          {/* <Footer /> */}
         </ThemeProvider>
       </body>
     </html>

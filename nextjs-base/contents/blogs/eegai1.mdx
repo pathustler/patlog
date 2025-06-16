@@ -1,0 +1,508 @@
+---
+title: "Foundations of the EEG-Driven Cognitive-Aware Autonomous Driving Capstone: Business Model, Planning & Problem Framing"
+description: "Explore how to create a recursive file system in React. This blog post provides a comprehensive guide on building a file system where folders and files can be nested, added, renamed, and deleted."
+topic: "ML Development"
+project: "🚘 EEG-Driven Cognitive-Aware Autonomous Driving System Capstone Project"
+date: 16-03-2025
+authors:
+  - avatar: "https://avatars.githubusercontent.com/u/128213324?v=4"
+    handle: pathustler
+    username: Me
+    handleUrl: "https://github.com/pathustler"
+  - avatar: "https://avatars.githubusercontent.com/u/154716590?v=4"
+    handle: M00d3h
+    username: Moodeh
+    handleUrl: "https://github.com/M00d3h"
+  - avatar: "https://avatars.githubusercontent.com/u/164710223?v=4"
+    handle: jkli-2
+    username: Junkai
+    handleUrl: "https://github.com/jkli-2"
+  - avatar: "https://avatars.githubusercontent.com/u/93026704?v=4"
+    handle: beetleberries
+    username: Beetleberries
+    handleUrl: "https://github.com/beetleberries"
+  - avatar: "https://avatars.githubusercontent.com/u/165783633?v=4"
+    handle: HyunHL
+    username: Hyun
+    handleUrl: "https://github.com/HyunHL"
+  - avatar: "https://avatars.githubusercontent.com/u/184797511?v=4"
+    handle: MasonEzraJeffrey
+    username: Mason
+    handleUrl: "https://github.com/MasonEzraJeffrey"
+    
+cover: "/covers/eegai1.jpg"
+---
+
+## Foundations of the EEG-Driven Cognitive-Aware Autonomous Driving Capstone: Business Model, Planning & Problem Framing
+
+An AI-assisted EEG-conditioned autonomous driving system that can analyse the driver’s brainwaves in real-time, predicting their cognitive state, and then making an informed driving decision which considers both the surroundings and internal data.
+
+Check out the project on Github for [Task 1](https://github.com/beetleberries/LBM) and [Task 2](https://github.com/M00d3h/Capstone-LLaVA-Task2) for a complete implementation.
+
+## 🏢 Company Overview 
+### 1.1 About the Company  
+
+Our company pioneers the integration of neuroscience, artificial intelligence and autonomous driving to develop a self-driving system that seamlessly implements BCI (brain computer interaction) in decision-making. We use EEG-based emotion recognition and cognitive process modelling along with spatial information from sensors for behavioural planning in autonomous driving. The aim of the company is to build a system that predicts and responds dynamically to cognitive and emotional states.
+
+
+### 1.2 Mission Statement 
+
+Our mission is to develop a cutting-edge intelligent self-driving technology that can bridge the gap between human cognition and autonomous decision making in domain of self-driving cars. To provide safer and more intuitive autonomous driving experiences by staying in sync with the driver’s emotional state. To create a system that predict intentions and make a more informed driving decision. Our goal is to use machine learning, neuroscience and autonomous driving technology to make driving safer than ever. 
+
+## 👥 Team and Roles  
+
+
+### 2.1 Team Member Biographies 
+
+👤 **Junkai Li** (@jkli-2)
+
+Junkai Li is an international student at UTS, pursuing a Bachelor of Information Technology majoring in Data Analytics. He has experience in developing web and app-based control software for industrial robotic arms. Proficient in multiple programming languages, Junkai has a strong foundation in software development and has completed a machine learning course project, sparking his interest in AI applications. He is passionate about autonomous driving and neuroscience, aiming to explore how machine learning can revolutionize decision-making in self-driving systems. Highly motivated and committed to achieving a strong outcome, Junkai is focused on expanding his expertise and excelling in the field of AI-driven automation. 
+
+
+👤 **Gokul Kannan** (@pathustler)
+
+Gokul Kannan is a student from the University of Technology, Sydney, majoring in Artificial Intelligence. Has spent 3 years workings as a full stack web developer for various clients and projects as a freelancer, creating a strong background in programming, project management and interface development. Overtime, transitioned to building machine learning models and integrating them into user interfaces built from scratch for personal projects. Key strengths include building models involving image processing, sequential data processing, large language models for real world applications, integrating AI-driven solutions into mobile apps and websites. Proficient in python, from model training to deploying them in full-stack applications. 
+
+👤 **Mason Jeffrey** (@MasonEzraJeffrey)
+
+Mason Jeffrey is a highly motivated and disciplined student currently completing his third year of a Bachelor of Artificial Intelligence at the University of Technology Sydney. A strong programmer with a passion for creating apps and AI applications in Python, he has built deep learning models for brain tumour and blood cell classification early in his studies. Last year, he developed an AI system with an object detection and classification model, featuring a user-friendly GUI, capable of alerting lifeguards to swimmer in distress. He is currently working on exciting new AI projects during his internship at 3M and other firms. 
+
+👤 **Mohammad Alhajjeh** (@M00d3h)
+
+Mohammad Alhajjeh is a third-year student studying a Bachelor of Artificial Intelligence at the University of Technology Sydney. Passionate about computer vision he has completed various machine learning projects such as developing an FCN model capable of detecting the presence of a tumour in an MRI brain scan. When a tumour is detected, the model will classify its type and produce a heatmap highlighting the most probable locations of the tumour in the brain. This model was deployed publicly to users on a web interface. 
+
+👤 **Hyun Ho Lee** (@HyunHL)
+
+Hyun Ho Lee is an international student from South Korea currently studying at University of Technology Sydney. He is majoring in Artificial Intelligence and have strong foundation and passion in deep learning. He has prior experience in building CNN models for various applications, including dock object detection, jellyfish identification, and multimodal speaker attribution. Hyun also has experience with cloud platforms, having developed models using AWS SageMaker last year. Additionally, he presented his multimodal speaker attribution model at the 2024 UTS AI Showcase. 
+
+👤 **Alexander Chesterman** (@beetleberries)
+
+Alexander Chesterman is a UTS computer science student majoring in AI and data analytics. His background is in Computer vision, Data analytics and Computer Graphics. With interests extending into low level computer architecture and programming, He hopes to continue tackling interesting projects to build more experience and improve his programming skills. 
+
+
+
+
+The core of the project is a recursive data structure that represents the file system. Each folder can contain other folders or files, and each file or folder has properties such as `id`, `name`, and `children` (for folders).
+
+Here’s a basic structure for a folder:
+
+
+
+### ✏️ Role Assignments 
+
+Due to our project’s complexity and the fact that we have six members, we have divided Task-1 and Task-2 into specific technical roles. 
+
+For Task-1:  
+  - **Alexander Chesterman** will lead the preprocessing and feature extraction stage for EEG data. 
+
+  - **Mason Jeffrey** will lead the development of the Large Brain Model. 
+
+  - **Hyun Ho Lee** will lead the model fine-tuning and training stage. 
+
+
+For Task-2:  
+
+  - **Junkai Li** will lead the CARLA environment setup stage. 
+
+  - **Mohammad Alhajjeh** will lead the alignment of the LLM with the Large Brain Model outputs. 
+
+  - **Gokul Kannan** will lead the data engineering, performance evaluation and testing phase.  
+
+Having a designated role does not mean you are solely responsible for completing that task. Instead, it means you will take the lead in guiding your teammates, researching, and deeply understanding the stage. In addition to these technical roles, we have on project wide role: 
+  - Team Leader and Document Manager – **Hyun Ho Lee**
+
+
+## 📄 The Project  
+### 3.1 Business Problem 
+By integrating computer vision and AI into conventional driving, autonomous driving technology has introduced an innovative approach, replacing the sole reliance on manual operation (Rajendran et al., 2024). While the mixture of computer vision and AI technology has significantly improved vehicles' ability to accurately perceive their surroundings, detect obstacles with greater precision, and enhance autonomous decision-making, it has a critical limitation which is, it fails to account for the driver's cognitive and emotional state.  
+
+For instance, if a driver is drowsy, fatigued or emotionally not capable of manually driving, the driver might struggle to respond appropriately to road hazards, increasing accident risks. Current AI-based autonomous systems focus on external factors but fail to adapt to the driver’s real-time cognitive and emotional state. Existing semi-autonomous systems overlook fatigue, drowsiness, and emotions, limiting their ability to ensure safe transitions between manual and automated driving (Lee et al., 2021).  
+
+To solve this issue, we aim to develop a real-time assistance system that extracts EEG signals to monitor the driver's cognitive state and integrates mental state insights into an LLM-assisted decision-making system, combining with autonomous vehicles to enhance driver’s safety and decision-making. This system will be validated using CARLA, an advanced open-source autonomous driving simulator, where we will test EEG-based decision-making in structured driving scenarios. CARLA allows us to simulate diverse real-world conditions, including unpredictable pedestrian movement, challenging weather, and dynamic traffic behaviour, ensuring that our system adapts effectively to real-world complexities. 
+
+Below is a screenshot of our CARLA simulation setup, where we replicate critical driving scenarios to evaluate the EEG-enhanced model’s ability to infer driver intent and improve decision-making accuracy. 
+
+![Figure 1: CARLA simulation environment ](/blogs/ml/egai1/1.png)
+
+### 3.2 Data Mining Approach 
+Our project consists of two key technical components. 
+
+  - **Task 1**: EEG-based representation learning and decoding to classify the driver’s cognitive and emotional state. 
+
+  - **Task 2**: LLM-assisted decision-making in driving scenarios, incorporating the classified driver states with real-time visual input. 
+
+**3.2.1 Data Preprocessing**
+
+*Task-1:*
+
+Since we already have access to a large EEG dataset by our mentor, tools for physical EEG data collection (such as BCI headsets, EEG amplifiers, or real-time EEG recording software) are not required, as well as real-time EEG data streaming (used for live brain signal tracking), or data labelling (such as automated annotation tools). However, we may choose to utilize extra EEG datasets beyond the provided data when the need arises – e.g. for diversity, addressing class imbalance, fill in missing EEG patterns, and benchmarking our Large Brain Model. If that’s the case, we must check that any EEG dataset from Kaggle, MOABB, or other sources has the correct labelling and consistency – as these datasets often need an EEG signal expert in the loop to verify accuracy.   
+
+Because EEG data contains a lot of noise, to filter out artifacts and random activity from the true brain signals, the EEG preprocessing pipeline is employed to enhance signal quality and ensure that relevant cognitive patterns are preserved for downstream modelling. As such we will use MNE-Python for the preprocessing and feature extraction pipeline. We begin with filtering using MNE-Python, targeting the 4-30Hz range, which includes Theta (4-8Hz, decision-making), Alpha (8-13Hz, alertness), and Beta (13-30Hz, cognitive processing), which are critical frequency bands for understanding driver cognition and situational awareness. 
+
+Next, we will down-sample the data, flag and interpolate any noisy channels, extract data epochs, reject with Independent Component Analysis (ICA) to remove artifacts caused by eye movements, muscle activity, and electrical noise, and normalize the signals (from -1 to 1). Once these techniques are complete, we will plot the preprocessed EEG data to check accuracy.  
+
+*Task-2:*
+
+In Task 1, we used EEG data to classify the drivers emotional and cognitive state and producing a structured text output describing it. In Task 2, we will feed this text output for decision-making that influences an autonomous driving system. Rather than building an LLM right from scratch, we instead plan to make use of existing pretrained MLLM (Multi-modal Large Language Model) and fine-tune that on relevant datasets. 
+
+These datasets, however, might require some preprocessing, such as removal of irrelevant text data, vocabulary optimisation, and feature engineering that best help in sentiment analysis and decision making. The data that we get from the EEG can be tokenized in a way to reduce the vocabulary size and improve the model’s efficiency. Additionally, text cleaning can also be used to focus more on improving the model for this specific task, effectively performing better than a generic LLM. 
+
+On the other hand, we will also be using a POV RGB camera to understand the external environment, to help us make more accurate predictions. We will perform frame extraction from the video data from the camera in real time, capturing the image frames at regular intervals, preferably 30 frames per second (FPS).  Since an MLLM can take in text input along with image data to come up with a driving action, this feature can be made use of by directly feeding the model with the image from the camera. A few features we would want to extract includes lanes, roads, traffic signs, pedestrians and vehicles and other objects. 
+
+When it comes to data mining in task 2, our focus is on improving the efficiency and accuracy of the MLLM to fit our needs. For this, feature extraction would be necessary to build a dataset filled with features that involve the text data about cognitive states of the driver as well as the external driving factors we extract from the POV RGB camera we will be using. 
+
+
+
+**3.2.2 Data Analysis**
+
+
+*Task-1:*
+
+After preprocessing—where we remove artifacts, apply filtering, segmentation, and ICA—our focus shifts to feature extraction and modelling to uncover meaningful EEG patterns relevant to driving scenarios. We will extract frequency-domain features such as Theta, Alpha, and Beta power, along with statistical descriptors like variance and mean amplitude, which help characterize cognitive states like attention, intent recognition, and uncertainty. 
+
+To ensure we use the most relevant features, we employ feature selection techniques to identify which EEG patterns correlate best with specific Theory of Mind (ToM) insights (e.g., detecting hesitation in merging traffic or a pedestrian's intent to cross). Additionally, we will perform cross-modal correlation analysis, aligning EEG-derived cognitive states with external driving scene labels. For example, a pedestrian preparing to cross may trigger frontal alpha synchronization, indicating increased driver attention—this alignment ensures that EEG signals enhance driving decision-making rather than operating in isolation. 
+
+*Task-2:*
+
+In Task-2, data analysis consists of majorly analysing the results of the model’s performance. Decision accuracy will be measured to assess the performance of the model, giving us an idea about how effective the model can be in real life. The key areas of for analysis would be accuracy, reliability and effectiveness in decision making. 
+
+We will be using a few metrics for data analysis of the model, such as - 
+  - Decision Accuracy – To see how often the decision taken by the model when driving aligns with expert-labelled decisions. 
+
+  - Reaction Time – This helps us get an understanding of how quickly the system can react to stimuli after receiving the input, so make sure it keeps up with the POV RGB camera’s feed at 30FPS.  
+
+  - Consistency – To measure how often the model can take good decisions despite varying inputs and difference in environment and conditions. 
+
+  - Error Rate – Analysing miscalculations and bad decisions taken by the system and making sure this number is as low as possible, focussing on reducing a particular type of errors which can pose any danger to the driver. 
+
+By using such metrics, we can analyse the model when testing it and fine-tune it to perform the best. Data analysis for task 2 is a step we will perform later during this project after we are done with the model building phase. Moreover, this is done side-by-side with CARLA, since it is important to make sure the metrics align with what we would get if we were to perform this experiment on a real car with a real driver, and CARLA does a great job in simulating that environment for us. 
+
+
+**3.2.3 Model Selection and Training Plan**
+
+*Task-1:*
+
+Recent advances in Transformer based self-supervised learning specifically in NLP has shown the learning power of these models for advanced understanding of complex sequential data (Vaswani et al., 2023). We intend to continue this research trend by exploring its use in understanding EEG data. 
+
+To develop the Large Brain Model for EEG-based driver cognitive state classification, we will adopt a fully Transformer-based approach, eliminating CNNs and RNNs. Our focus will be on Vector Quantization (VQ) Transformers, which will encode EEG signals into discrete representations, forming the foundation for Masked EEG Modelling (MEM) and Next-Token Prediction (NTP). These techniques will enable the model to reconstruct missing EEG segments and predict future signal patterns, enhancing its ability to capture temporal dependencies. 
+
+To improve robustness in handling EEG noise and variability, we will explore Diffusion Transformers, which specialize in denoising and structured feature extraction. Additionally, Contrast Predictive Coding (CPC) will be used to refine learned representations by predicting future EEG embeddings, improving feature discrimination in self-supervised learning. 
+
+As mentioned, for EEG preprocessing, MNE-Python will be used to filter signals between 4-30Hz, targeting Theta, Alpha, and Beta bands, while ICA (Independent Component Analysis) will remove artifacts such as eye movement and muscle noise. We will also extract frequency-domain features to enhance model performance. 
+
+The training process will utilise Lion (Evolved Sign Momentum) optimizer for efficient and stable convergence. Cross-Entropy Loss will be used for VQ training and masked modelling, while InfoNCE Loss will optimize CPC training. Evaluation metrics will include accuracy, F1-score, and ROC-AUC, alongside reaction time analysis to assess real-time system responsiveness. 
+
+To fine-tune model performance, we will first apply grid search for hyperparameter tuning, followed by Bayesian optimization to enhance efficiency and generalization. This structured approach ensures a robust EEG modelling framework optimized for cognitive state classification in autonomous driving applications. 
+
+*Task 2:*
+
+As mentioned before, for Task-2 we aim to integrate a pre-trained LLM as a coarse-level planner. This model will be connected to our CARLA environment, and we will fine-tune it to process EEG cognitive state outputs from Task-1's Large Brain Model alongside visual inputs for making more informed driving decisions. Additionally, we will explore reinforcement learning as an alternative approach, comparing it against the LLM-based decision-making process. 
+
+Firstly, we will connect the LLM to our custom-built CARLA environment and then test if it makes good decisions, which would be its baseline decision-making performance before EEG integration. As a proof-of-concept, we will use OpenAI’s API to output discrete driving actions (Front, Left, Right, Back) based on multi-view visual inputs from CARLA. This will serve as a baseline performance metric before advancing to deeper model fine-tuning.  
+
+Once the LLM is functioning correctly, we will feed EEG cognitive state outputs into the LLM and analyse how these additional signals influence driving behaviour. For example, we expect to observe include more responsive driving. If the driver shows signs of cognitive impairments, our system pulls the car over immediately. The evaluation metrics will include reaction time, decision accuracy, and intervention effectiveness. It ensures that the system can recognize abnormal driver behaviour and initiate appropriate responses. 
+
+To fine-tune the LLM, we will implement LoRA (Low-Rank Adaptation) fine-tuning combined with instruction tuning, where the model is trained using carefully crafted driving scenarios as well as constructed CARLA scenarios labelled with cognitive states and optimal responses. This approach ensures that the model learns EEG-aware driving behaviours without overfitting. These scenarios will include ToM-based challenges, such as a cyclist subtly signalling awareness of the ego vehicle, pedestrian hesitation, and driver-to-driver nonverbal communication. The LLM will learn to process and integrate classified driver cognitive states (alert, drowsy, distracted) while simultaneously analysing real-time environmental inputs from RGB cameras. 
+
+The optimizer of choice is also Lion optimizer due to its efficient and stable convergence in fine-tuning large-scale LLMs. If necessary, AdamW will be used as an alternative as shown in the DriveMLM model (Wang et al., 2023). For decision learning, we will use Cross-Entropy Loss, which ensures the model learns to output correct driving actions based on EEG-state and environment input. 
+
+The ultimate goal is to determine whether EEG-enhanced decision-making improves or hinders autonomous driving. This will be assessed by comparing the LLM’s visual-only decision-making against its EEG-augmented version. By leveraging Task 2’s multimodal fusion outputs, we aim to refine the system’s ability to interpret human cognitive states and enhance vehicle autonomy through a robust, intent-aware decision-making process. 
+
+**3.2.4 Data Description**
+
+To summarise, our project involves multimodal data, primarily EEG signals and simulated driving scene data, which will be used to train and evaluate an EEG-assisted driving decision system. 
+
+*Task 1:*
+
+  - Source: provided EEG recordings from drivers performing driving tasks. 
+
+  - Preprocessing: MNE-Python is used to isolate Theta (4-8Hz, decision-making), Alpha (8-13Hz, alertness), and Beta (13-30Hz, cognitive processing) bands. 
+
+  - Feature Extraction: 
+
+    - Time-domain features: Mean amplitude, Variance, Entropy 
+
+    - Frequency-domain features 
+
+    - Event-Related Potentials: Frontal Alpha Synchronisation (for intent recognition) 
+
+  - Data Labels: 
+
+    - Awarenesses Level (Alert, Drowsy, Distracted) 
+
+    - Cognitive Load Level (Low, Moderate, High) 
+
+    - Theory of Mind States (multiple, e.g. detecting pedestrian intent) 
+
+*Task 2:*
+
+  - Source 1: Processed EEG features 
+
+    - Driver Awareness Level 
+
+    - Cognitive Load Level 
+
+    - Theory of Mind States 
+
+  - Source 2: CARLA simulator 
+
+    - Ego vehicle telemetry: Speed, Pose (x,y,z,yaw,pitch,roll), Sensor output (camera feed) 
+
+    - Traffic environment: Pedestrian movement, Occlusions, Traffic signals 
+
+
+
+
+**3.2.5 Proposed Method**
+
+![Figure 2: Task-1 and Task-2 preprocessing, modelling, and training pipeline. ](/blogs/ml/egai1/2.png)
+
+We propose to work using the agile SDLC to ensure efficient teamwork while keeping the team flexible to potential challenges. This is a two-task approach for integrating EEG-based brain activity prediction with the Large language Model for the autonomous driving decision making in the environment. For this reason, breaking the system into two parallel tasks, would allow independent development and testing. The two tasks can be trained, managed, fine-tuned and evaluated independently. Moreover, a modular design during the development of such complex deep learning models would make it easier to replace and improve components, while ensuring agility and scalability for future enhancements in the project. For these reasons, we decided to go with this SDLC approach. 
+
+*Task-1:*
+
+We start by understanding how the EEG data correlate with the human cognitive and emotional state. We then move on to reviewing transformer-based EEG models and how they process the brain data. Once that is done, we perform data cleaning, like we explained in the previous section helping us gather information about various cognitive states like attention level, stress and so on. With a cleaned dataset, we will proceed to model selection and design. At the moment, the team has planned to use a VQ-transformer, but we will also look at various models and their performance on this dataset. Once the model has been built, we get to the training and hyperparameter tuning phase. Once the model is ready for the task, we will evaluate its accuracy and finally integrate it to the LLM in task 2. 
+
+*Task-2:*
+
+EEG signals that are processed and classified in Task 1, representing driver awareness level and mental workload, serve as a critical input for Task 2, where they are fused with RGB camera data to enhance the decision-making process. 
+
+The close connection between Task 1 and Task 2 ensures that decision-making in our system incorporates an understanding of driver cognition, allowing for more adaptive and context-aware vehicle control. By bringing EEG based intent recognition with real-time environmental perception, our system enhances situational awareness, reduces false positives and enables more human-like, intuitive driving behaviour. 
+
+
+
+
+## ⏳ Project Feasibility 
+
+### 4.1 Required Resources 
+
+
+**Task-1:** *Developing a Large Brain Model to differentiate between normal and abnormal EEG data*
+
+To complete ‘Task-1’ of the project, which involves either improving the backbone of a pre-existing Large Brain Model for our problem or developing one from scratch, we will need to use a variety of tools and resources which are outlined in the table below: 
+
+| **Topic**                                        | **Resources**                                                                                                                                                                                        | **To-do**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+|--------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Research                                         | Peer-reviewed papers found on Google                                                                                                                                                                 | Read peer-reviewed papers on EEG modelling and foundational topics – e.g. “Driving intention prediction”, “Large Brain Model Learning”, “EEG-based emotion recognition” – before stemming out to complex areas.  Before starting data processing read peer-reviewed papers on EEG preprocessing, EEG encoding, feature extraction, and other related techniques.  Once in the process of model development read peer-reviewed papers on developing, fine-tuning, and training Large Brain Models.                                  |
+| Datasets                                         | Public EEG datasets – such as MOABB, any BCI competition dataset, Kaggle EEG datasets, OpenNeuro, etc.  Google Drive                                                                                 | We will be provided an EEG dataset with labelled generic representations (e.g. normal or abnormal) for training our model. Despite this, we may turn to other EEG datasets for benchmarking – using MOABB.   If needed, acquire additional EEG datasets – from public repositories online like Kaggle EEG datasets (although be careful as these are often limited in size and not suitable for large-scale training).   Load and store all EEG datasets using Google Drive for easy sharing, training, and overall organization.  |
+| Data Processing, Model Fine-Tuning, & Training   | Signal processing libraries such as MNE-Python, PyEEG, NeuroKit2, etc.   Other libraries such as TensorFlow, Scikit-learn, etc.   Coding environment such as Lambda Labs, Google Colab or VS Code.   | Use an effective coding environment throughout the semester (e.g. Google Colab and Lambda Labs) for collaboration and training our Large Brain Model. Also, make sure to use signal processing libraries for preprocessing and feature extraction.  Use Lambda Labs over Colab Pro or other solutions for model training since we need high-performance GPUs for long-running workloads.                                                                                                                                           |
+| Collaboration                                    | Lambda Labs & Google Colab  GitHub  Microsoft Teams                                                                                                                                                  | Use Lambda Labs and Google Colab to share code and train model.  Always maintain version control using GitHub (assign a group member to regularly commit changes and review code).  Communicate openly on Microsoft Teams making sure to share team/individual progress, ask for help when needed, and arrange assignments.                                                                                                                                                                                                        |
+| Support                                          | Project mentor (Jianlong Zhou)  University tutorials, workshops, etc                                                                                                                                 | Always seek guidance, input, and direction from our project mentor whenever confused about a task or milestone. Also, share the Large Brain Model code and progress openly via Microsoft Teams. Submit drafts a week prior to the final submission of AT2 and AT3.  Refer to course material on Canvas and the UTS Library for any additional papers.                                                                                                                                                                              |
+
+
+**Task-2:** *Aligning a LLM used for autonomous driving with Task-1’s Large Brain Model*
+
+To complete ‘Task-2’ we will need to integrate Task-1’s finalized Large Brain Model with our LLM for autonomous driving in an effort to address the missing human factor. As such we will need to use different tools and resources such as: 
+
+| **Topic**                                        | **Resources**                                                                          | **To-do**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+|--------------------------------------------------|----------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Research                                         | Peer-reviewed papers found on Google  CARLA tutorials shared with by our mentor        | Read peer-reviewed papers on EEG modelling and foundational topics – e.g. “Cognitive process modelling for object goal navigation with LLMs”, “Aligning multi-model LLMs with behavioural planning states for autonomous driving” – before stemming out to complex areas.  Before starting we will need to read and walk through the CARLA tutorials to correctly setup the virtual and randomized car training environment.  Even though we won’t be required to build a LLM from scratch, we will read peer-reviewed papers on fine-tuning and optimizing LLMs.  Once in the process of model development read peer-reviewed papers on integrating autonomous driving LLMs with human behaviour. (e.g. “DriveMLM: Aligning Multi-Modal Large Language Models with Behavioural Planning States for Autonomous Driving”, “Safety-Enhanced Autonomous Driving Using Interpretable Sensor Fusion Transformer”)  |
+| Environment                                      | CARLA                                                                                  | Setup a virtual and randomized car training environment using CARLA.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| Data Processing, Model Fine-Tuning, & Training   | Coding environment such as Lambda Labs, Google Colab or VS Code   Google Drive         | Access to a coding environment either Lambda Labs, Google Colab or VS Code for LLM alignment, behaviour mapping, and model training/testing.   Load and store Task-1’s Large Brain Model outputs.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| Collaboration                                    | Lambda Labs & Google Colab   GitHub  Microsoft Teams                                   | Use Lambda Labs and Google Colab for shared coding and training throughout the semester.   Always maintain version control using GitHub.   Share progress, arrange team tasks, communicate openly on Microsoft Teams.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| Support                                          | Project mentor (Jianlong Zhou)  University tutorials, workshops, etc                   | Always seek guidance, input, and direction from our project mentor whenever confused about a task or milestone. Also, share the CARLA environment as well as LLM code and progress openly via Microsoft Teams. Submit drafts a week prior to the final submission of AT2 and AT3.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+
+
+
+## 🗓️ Project Management Plan 
+
+### 5.1 Deliverables 
+
+**Task-1:** 
+
+The main deliverable for Task-1 is a fully developed, trained, and fine-tuned Large Brain Model capable of classifying normal and abnormal EEG data. We will save and store all Task-1 code and outputs in the following locations:  
+
+Lambda Labs and Google Colab – for working on the code together, training, and displaying frozen outputs. 
+
+Google Drive – for dataset storage, model versions, and training outputs.  
+
+GitHub – for version control and tracking progress. 
+
+Zip File – for the final submission which will include preprocessing code, model training as well as fine-tuning code, and evaluation and performance metrics.  
+
+**Task-2:**
+
+For Task-2, we will finalize the Large Brain Model with a LLM for autonomous driving to address to missing human factor in decision-making. The deliverables will include: 
+
+CARLA simulation environment setup. 
+
+A fully trained and tested LLM with the connected EEG-based system. 
+
+All Task-2 code stored in Lambda Labs, Google Colab, Google Drive, and GitHub.  
+
+For both Task-1 and Task-2, all data analysis findings, performance metrics, results, and challenges faced will be documented in both Assignment 2 (AT2) and Assignment 3 (AT3) reports. 
+
+
+### 5.2 Work Plan Diagram 
+
+In section 5.3, we have structured our work plan into distinct milestones, each representing a key phase of our project development. To visualise these phases, Gantt chart is provided in Figure 3. 
+
+![Figure 3: Project Timeline ](/blogs/ml/egai1/3.png)
+
+
+### 5.3 Milestones & Timeline 
+
+The project is divided into 8 major milestones throughout the duration of the project. Each milestone includes a summary of tasks, deliverables and expected due date. 
+
+
+
+
+
+<Stepper>
+  <StepperItem title="Week 1-2: Project Commencement">
+  The goal is to establish the research foundation and define the overall architecture.
+    - Literature review on EEG, LLMs, and RL-based driving models.  
+
+    - Define architecture and methodology.  
+
+    - Finalize model selection.  
+
+    - Project feasibility confirmed. 
+
+  *Deliverable:** individual research review summary.*
+    
+  </StepperItem>
+  <StepperItem title="16 March 2025: Plan Proposal">
+      - Submission of this proposal document for client and internal review. 
+
+      - Receive feedback and make necessary adjustments. 
+    *Deliverable: proposal document.* 
+  </StepperItem>
+  <StepperItem title="March 2025: Data Collection">
+    
+      Task 1: EEG Data Processing 
+
+        - EEG & driving data cleaning 
+
+        - Feature extraction with VQ-Transformer 
+
+        - Perform exploratory data analysis. Ensure EEG data is structured for model training.  
+
+      Task 2: Driving Data Preparation 
+
+        - Ensure camera inputs are structured for LLM. 
+
+        - Ensure pre-trained LLM performs well in our CARLA environment. 
+
+        - Ensure the pretrained LLM performs well in CARLA before EEG integration. 
+
+      *Deliverable: preprocessed dataset, feature selection report, initial CARLA testing report.* 
+
+
+  </StepperItem>
+
+
+
+  <StepperItem title="April 2025: Model Training">
+      
+      Task 1 
+
+        - Implement VQ-Transformer for EEG encoding. 
+
+        - Apply masked EEG modelling, Next-Token Prediction, and Contrast Predictive Coding. 
+
+        - Train EEG classification model, with optimisation and hyperparameters fine-tuning.  
+
+      Task 2 
+
+        - Conduct proof-of –concept with OpenAI API for driving actions 
+
+        - Fine-tune LLM agent or RL model for decision-making. 
+
+      *Deliverable: first version of trained EEG model, fine-tuned LLM/RL model.*
+
+  </StepperItem>
+
+
+
+  <StepperItem title="Mid-Project Update">
+      *April 2025* 
+
+  - Basic Integration of BCI (Task 1) with MLLM along with the RL model (Task2). 
+
+  - Implement real-time data flow between EEG, MLLM, and CARLA. 
+
+  - Evaluate how EEG cognitive state influences LLM decisions. 
+
+  - Observe LLM-generated responses before fine-tuning. 
+
+*Deliverable: first version of the integrated system that is yet to be fine-tuned and tested.* 
+  </StepperItem>
+
+
+  <StepperItem title="May 2025 : Final Testing & Refinement ">
+      - Ensure real-time EEG-LMM interactions. 
+      - Integration of EEG, LLM, and CARLA. 
+      - Evaluate system under various conditions. 
+
+    *Deliverable: an integrated system in CARLA, with performance evaluation report.*
+  </StepperItem>
+
+  <StepperItem title="May 2025 : Project Evaluation (Internal) ">
+      - Use CARLA for Evaluation of the model under different conditions. 
+
+      - Measure key performance indicators. 
+
+    *Deliverable: A detailed report with metrics recorded while evaluating the model in CARLA* 
+  </StepperItem>
+
+
+  <StepperItem title="June 2025 : Final Report Submission ">
+      - Compile results, insights, and improvements into the final report. 
+
+      - Prepare presentation and demo video. 
+
+    *Deliverable: Final report, presentation, demo video.*
+  </StepperItem>
+
+
+</Stepper>
+
+
+
+ 
+
+ 
+
+
+
+
+
+
+
+
+## 🚀 Conclusion
+
+
+Check out the project on Github for [Task 1](https://github.com/beetleberries/LBM) and [Task 2](https://github.com/M00d3h/Capstone-LLaVA-Task2) for a complete implementation.
+
+
+
+
+## 📑 References 
+
+ 
+
+  - Cao, Y., Zhang, J., Yu, Z., Liu, S., Qin, Z., Zou, Q., Du, B., & Xu, K. (2024). CogNav: Cognitive Process Modeling for Object Goal Navigation with LLMs. https://doi.org/10.48550/arxiv.2412.10439 
+
+  - HAI Team. (2025). CARLA tutorial. 
+
+  - Jiang, W.-B., Zhao, L.-M., & Lu, B.-L. (2024). Large Brain Model for Learning Generic Representations with Tremendous EEG Data in BCI. https://doi.org/10.48550/arxiv.2405.18765 
+
+ 
+
+  - Lee, H.-G., Kang, D.-H., & Kim, D.-H. (2021). Human–Machine Interaction in Driving Assistant Systems for Semi-Autonomous Driving Vehicles. Electronics (Basel), 10(19), 2405-. https://doi.org/10.3390/electronics10192405 
+
+ 
+
+  - Rajendran, S., Sabharwal, M., Hu, Y.-C., & Balusamy, B. (2024). Artificial Intelligence for Autonomous Vehicles : The Future of Driverless Technology. (1st ed.). John Wiley & Sons, Incorporated. 
+
+ 
+
+  -  Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, L., & Polosukhin, I. (2023). Attention Is All You Need. https://doi.org/10.48550/arXiv.1706.03762 
+
+ 
+
+  - Wang, W., Xie, J., Hu, C., Zou, H., Fan, J., Tong, W., Wen, Y., Wu, S., Deng, H., Li, Z., Tian, H., Lu, L., Zhu, X., Wang, X., Qiao, Y., & Dai, J. (2023). DriveMLM: Aligning Multi-Modal Large Language Models with Behavioral Planning States for Autonomous Driving. https://doi.org/10.48550/arxiv.2312.09245 
+
+ 

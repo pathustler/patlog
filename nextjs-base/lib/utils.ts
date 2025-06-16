@@ -117,3 +117,5 @@ export function getIconName(name: string) {
   const ext = splittedNames[splittedNames.length - 1];
   return fileExtensionIconMap[ext as keyof typeof fileExtensionIconMap];
 }
+
+

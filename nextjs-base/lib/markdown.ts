@@ -79,6 +79,8 @@ async function parseMdx<Frontmatter>(rawMdx: string) {
 export type BaseMdxFrontmatter = {
   title: string;
   description: string;
+  topic: string;
+  project : string
 };
 
 export async function getCompiledDocsForSlug(slug: string) {
@@ -205,7 +207,7 @@ export async function getAllBlogStaticPaths() {
   } catch (err) {
     console.log(err);
   }
-}
+} 
 
 export async function getAllBlogsFrontmatter() {
   const blogFolder = path.join(process.cwd(), "/contents/blogs/");
