@@ -7,7 +7,7 @@ import {
 } from "@/lib/markdown";
 import { formatDate2, stringToDate } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Metadata } from "next";
+// import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -83,8 +83,6 @@ function BlogCard({
   date,
   title,
   description,
-  topic,
-  project,
   slug,
   cover,
   authors,

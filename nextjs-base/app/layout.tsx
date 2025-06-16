@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/contexts/theme-provider";
 import { Navbar } from "@/components/navbar";
 import { Space_Mono, Space_Grotesk } from "next/font/google";
-import { Footer } from "@/components/footer";
 import "@/styles/globals.css";
 
 const sansFont = Space_Grotesk({

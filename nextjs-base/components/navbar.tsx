@@ -1,6 +1,6 @@
 'use client';
 import { ModeToggle } from "@/components/theme-toggle";
-import { GithubIcon, TwitterIcon,LinkedinIcon, CommandIcon } from "lucide-react";
+import { GithubIcon,LinkedinIcon } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "./ui/button";
 import Anchor from "./anchor";
