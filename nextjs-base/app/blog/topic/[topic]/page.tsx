@@ -10,14 +10,28 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from 'next'
 
 
-type TopicPageProps = {
-  params: { topic: string };
-};
 
-export default async function TopicPage({ params }: TopicPageProps) {
-  const { topic } = params;
+type Props = {
+  params: Promise<{ topic: string }>
+}
+
+
+export async function generateMetadata(
+  { params }: Props
+): Promise<Metadata> {
+  const { topic } = await params;
+  console.log(topic);
+  return {
+    title: `Blog - ${topic}`,
+    description: `Latest articles on ${topic}`,
+  };
+}
+
+export default async function TopicPage({ params }: Props) {
+  const { topic } =  await params;
   console.log(topic)
 
   // Simulate fetching from a DB, CMS, or wherever the hell your content lives
