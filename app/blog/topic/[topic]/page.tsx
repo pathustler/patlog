@@ -1,4 +1,7 @@
 // app/blog/[topic]/page.tsx
+
+export const dynamic = 'force-dynamic'; 
+
 import { notFound } from 'next/navigation';
 import {
   Author,
