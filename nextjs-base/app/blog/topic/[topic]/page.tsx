@@ -12,9 +12,14 @@ import Image from "next/image";
 import Link from "next/link";
 
 
+type Props = {
+  params: {
+    topic: string;
+  };
+};
 
 
-export default async function TopicPage({ params }: { params: { topic: string } }) {
+export default async function TopicPage({ params }: Props) {
   const { topic } = params;
   console.log(topic)
 
