@@ -1,0 +1,146 @@
+---
+title: "Meetings and Project Kickoff"
+description: "A management system designed to make things easier for the team by keeping everything in one place—customers, calendar events, orders, workstation processes, etc."
+topic: "Software Development"
+project: "☀️ One shade at a time (OSAAT)"
+date: 08-01-2025
+authors:
+  - avatar: "https://avatars.githubusercontent.com/u/128213324?v=4"
+    handle: pathustler
+    username: Me
+    handleUrl: "https://github.com/pathustler"
+
+    
+cover: "https://stagmoney.com/wp-content/uploads/2025/01/1-1.png"
+---
+
+“One Shade At A Time” ([OSAAT](https://ossat.azurewebsites.net/)) is a management system website I built for SWSunControl, a company based in Arizona that builds sunshades. This system is designed to make things easier for the team by keeping everything in one place—customers, calendar events, orders, workstation processes, etc.
+
+In March 2023, we held meetings on Microsoft Teams where we discussed the project’s goals, initial requirements, all the different tools that can be used, and how we could align our efforts in building the new system that aligns with the old one while being able to implement new features, incorporating improvements to address the already existing problems.
+
+
+## 👥 TEAM AND MY ROLE
+
+![Folder of OSAAT Designs created by Amanda Moore](https://stagmoney.com/wp-content/uploads/2025/01/Screenshot-2025-01-03-at-11.48.54%E2%80%AFAM-2048x1315.png)
+<center>*Folder of OSAAT Designs created by Amanda Moore*</center>
+
+My role in this project was to look into the requirements and the workings of the features and build them into the new system accordingly. My work involved building the front end and back end of the whole project based on the designs that were given to me. The designs were PDF files to visually reflect how each page should look after the implementation.
+
+We held meetings every week, usually on Tuesday noons, where I showed them a quick presentation of everything I built based on the meeting held the previous week. While I do that, my colleague, James Sullivant, would bring up any change that was necessary in the implementation based on his meetings with the project owner.
+
+Once that was done, we discussed the how works of the old site and ended the meeting after deciding on the parts of the site that should be worked on for that week.
+
+I would like to thank James and his team for their exceptional problem-solving skills and collaborative spirit, and I should say, that he played a crucial role in keeping everything smooth and efficient throughout the project.
+
+
+
+
+## ⛏️ PICKING THE TOOLS
+
+During the research phase, it was decided that the project would be built on .NET, a C# web app development framework using HTML, CSS, JavaScript, and MSSQL for the backend. The old system was built using the .NET framework, and it seemed natural to stick with that. But it was not until later down the road (around 2 weeks before we started with the build) that we decided to use Django, a Python web framework along with MSSQL for the development.
+
+The reason for this was that, after exploring all the requirements and features of the new system, it was apparent that the new system needed integration with various third-party services and provide enough security within the site (which wasn’t the best in the old system), and moving with Django seemed to me like the best option. We thought using MSSQL for Django was fine, so there was no change on that part.
+
+The project was expected to make use of HTML, and CSS along with JavaScript for the front end. TailwindCSS was used, to give the whole thing a more responsive and robust look.
+
+
+## 📄 RESEARCHING THE OLD SYSTEM
+
+![Slack chat around 2 Weeks before we kickstarted the project (Details about the Login and Dashboard sent on Word)](https://stagmoney.com/wp-content/uploads/2025/01/Screenshot-2025-01-04-at-1.40.59%E2%80%AFPM-2048x994.png)
+<center>*Slack chat around 2 Weeks before we kickstarted the project (Details about the Login and Dashboard sent on Word)*</center>
+
+
+In my weekly meetings with James, I spent a fair amount of time trying to understand all the different features within the old system. Along with this, I also spent time understanding the overall workflow in sunshade manufacturing. In this post, will quickly go through everything that would be necessary to know how things work for the later parts of this series.
+
+
+## 🔐 USERS, LOGIN AND AUTHENTICATION
+
+![Login page](https://stagmoney.com/wp-content/uploads/2025/01/Screenshot-2025-01-04-at-2.01.56%E2%80%AFPM-2048x1136.png)
+
+Like most management websites, this one starts with a login page, where you can enter your username and password if you have a user account created under your name to get into the website. There is also an option where you can hit “Forgot password” and receive the password reset link mailed to your email. Once you get in, depending on the type of user you are, you see two different dashboards.
+
+|   Admin  | Customer |
+| -------- | ------- |
+|![Admin Dashboard](https://stagmoney.com/wp-content/uploads/2025/01/Screenshot-2025-01-04-at-2.03.21%E2%80%AFPM-1024x581.png) | ![Customer Dashboard](https://stagmoney.com/wp-content/uploads/2025/01/Screenshot-2025-01-05-at-2.16.28%E2%80%AFPM-1024x581.png) |
+
+Firstly, if you are a Dealer User, you will see the buttons linked to pages that allow you to get into the Dealer resources (A directory of all the pdf files that explain the products available for manufacturing), order entry, orders list, and so on.
+
+If you are an Admin User, you will see the buttons linked to pages that allow you admin access depending on the permissions set for you. Meaning, that you could be a staff responsible for creating and keeping track of customers, in this case, you will see “Add Customer” on your dashboard, but not “Calendars“.
+
+Among admin users, you have internal staff and main admins, depending on which you will be able to access the Django Administration Page, but that access is only granted to a handful of people.
+
+## 👤 CUSTOMER PAGE
+
+![](https://stagmoney.com/wp-content/uploads/2025/01/Screenshot-2025-01-05-at-2.30.32%E2%80%AFPM-2048x1158.png)
+
+This page will be accessible based on the customer’s unique code (which would be a mandatory unique 13-lettered alphanumeric code for each customer). A customer’s unique code would be the first 3 letters of their last name followed by their phone number. Within this page, you will see 4 tabs containing information related to the customer, which an admin user can view/change.
+
+The Info tab contains all the details about the customer, along with a button that pops up a frame that allows the admin to schedule a visit based on the type of visit (Technician, or Sales).
+
+The Gallery tab contains all images related to the customer, usually the ones that were uploaded into the timeline. The Timeline tab is a section where the admins communicate by posting issues or statuses.
+
+Finally, the Orders tab is a frame that is connected to a Wasabi-hosted bucket with all the folders named as the order’s job number under a folder named as the customer’s unique code, within each, you will see the Confirmation pdf named based on the order’s job number (a unique 7 digit number given to all finalized Orders), for every order that was placed for/by that customer. For example, if the customer with a unique code *CUS1234567890* placed an order with the job number *1000012*, you will see a folder structure like *CUS1234567890/1000012/1000012_Order_Confirmation.pdf*
+
+## 📦 ORDER WIZARD
+
+![](https://stagmoney.com/wp-content/uploads/2025/01/Screenshot-2025-01-05-at-3.22.41%E2%80%AFPM-2048x1158.png)
+
+Every time a customer wants to place an order (or sometimes, when an admin wants to place an order for a customer without a user account) they get into this page where they can go through the processes to place the order. We will get into the details of how units and orders come together, but for now, think of it as an order containing multiple units, and each unit is sort of like its own product, all shipped under a single order.
+
+![](https://stagmoney.com/wp-content/uploads/2025/01/Screenshot-2025-01-05-at-4.20.01%E2%80%AFPM-2048x885.png)
+
+Once you enter all the details, you will be taken to the respective pages based on where you are in the order entry process, and in the end, you end up with an Order Info Page that contains all the details about the particular order. Based on where you are in the order entry process, your order will be editable, or locked. The order summary page shows the total cost based on the products and their measurements that were selected on the Order Wizard page. The process is a bit different when you enter as an admin placing the order for the dealer(customer), compared to if you were the dealer placing the order for yourself. But in the end, it’s where you create an order, add units to it, and save it for the customer, all signed and finalized. The how works might be a bit confusing, but everything is covered in the post where I explain from scratch how I built the order entry feature into the website.
+
+## 📅 CALENDARS
+
+![](https://stagmoney.com/wp-content/uploads/2025/01/Screenshot-2025-01-06-at-9.56.12%E2%80%AFAM-2048x1105.png)
+
+When we talked about the customer’s page, we also discussed the schedule button and its functions. Every time a customer schedules a visit, they create an event (either Technician or Sales) and the event is linked to a job number(Order). There is also a third type of visit that can only be created by the admins, called a Delivery Event. Administrators assign technician and sales events to certain crews, which also appear on the event details with a filter option. Each of these event types is displayed in 3 calendars – Technician, Sales, and Delivery, depending on their type.
+
+The calendar page is only accessible to those internal staff users that have permission. Events can be edited using the pen icon on the right, which pulls out a movable popup window. Events can be deleted using the trash icon on the left of each event. Confirmed events have a little green checked icon on the top right corner, the colour of the event div depends on the type of visit (Installation, Warranty Service and so on).
+
+## 🧑‍🏭 PRODUCTION WORKSTATION
+
+|     |  | |
+| -------- | -------- | -------- |
+|![](https://stagmoney.com/wp-content/uploads/2025/01/Screenshot-2025-01-06-at-10.11.54%E2%80%AFAM-553x1024.png) | ![](https://stagmoney.com/wp-content/uploads/2025/01/Screenshot-2025-01-06-at-10.12.08%E2%80%AFAM-553x1024.png) | ![](https://stagmoney.com/wp-content/uploads/2025/01/Screenshot-2025-01-06-at-10.13.57%E2%80%AFAM-553x1024.png) |
+
+
+The production workstation is a crucial part of the system, and it is where production workers can keep track of their work in sunshade manufacturing. The reason why these pages are on the portrait is because they are used on a large portrait screen inside a room, where the employees can collectively work and check/uncheck work items.
+
+To get into a workstation job (orders that are released for production by the admins), you would have to click the button to get into the appropriate workstation. Then you would need to enter the job number of the order you want to open the workstation job for. This will take you to the workstation page for the job you entered.
+
+On most workstations, you have tabs that show certain buttons depending on the tab you are on. Each button represents a work that needs to be done to complete the job (sort of like a to-do list). These buttons have values based on the measurements and product type that were entered when placing the order. By default, these work items are incomplete (represented by an orange border with grey text). When you click on a button, they are marked complete (represented by a solid green background and white text). Once you mark all the work items in a tab as complete, the whole tab turns from orange-bordered to a green background. On the bottom, there are 2 buttons. The “Save and Close” button would save everything and take you back to the dashboard. The “Complete” button would mark the whole job as complete, and all the work inside the job would be considered completed.
+
+UI-wise they all look similar to the third image above. There are 8 types of workstation pages, most of them similar to each other, and some of them quite different.
+
+  - **Box Cut, Tube Cut, Pre Assembly, Hardware, Fabric:** They have the simplest workflow, with tabs that show buttons accordingly, and a complete button that will finish the whole job.
+  - **Powder Coat:** Probably the most complicated workstation page. The site generates a unique QR code for each unit in a workstation job that has been released for production. These QR codes are then scanned by a worker, to allow them to be released for powder coat. All units that are released for powder coat will be displayed in the powder coat workstation. These units will be displayed as buttons with the label showing the unit number and job number. The text, border, and background colour of these buttons depend on the status of other units of the same job, or the presence of an L-channel (I will go into detail about what this is later). There is a button called “Complete All“, which will mark all the units in the powder coat workstation as complete. All Completed units can be viewed inside the completed tab within the powder coat workstation page, where the units are sorted based on their completion date, and can be searched up using their completion date or job number.
+  - **Assembly:** Similar to Box cut and tube-cut workstations, the assembly workstation has a simple workflow. Except after all the work items are completed, instead of clicking “Complete” and completing the job, you would have to click on “Begin QC“. This will open a popup that shows 3 buttons (the seals of only 3 employees who are permitted to QC) along with a password field. The idea is for the QC employee to select their seal and enter the password for their account after checking all the work that was done. Entering the password would authorize them to Complete the job, and now they will see the “Complete” button to finish the job.
+  - **Shipping:** The Shipping workstation is similar to the Assembly workstation, except instead of 3 users, around 20 users are allowed to QC. The QC authorization popup will show the 3 seals as usual on top, along with a grid of buttons with the employees’ profile pictures. This is called “Quick-QC“, and the employee who is allowed to quick-QC must select their profile picture and enter their password to finish the job.
+
+
+## 🗾 MAP NAVIGATIONS
+
+|     |  | |
+| -------- | -------- | -------- |
+|![](https://stagmoney.com/wp-content/uploads/2025/01/Screenshot-2025-01-08-at-10.35.14%E2%80%AFAM.png) | ![](https://stagmoney.com/wp-content/uploads/2025/01/Screenshot-2025-01-08-at-10.37.02%E2%80%AFAM.png) | ![](https://stagmoney.com/wp-content/uploads/2025/01/Screenshot-2025-01-08-at-10.37.59%E2%80%AFAM.png) |
+
+Lastly, a feature that works along with the calendars we looked at previously, is the map navigations for Technician and Sales Visits. Every time an event is added to the calendar, it appears on the “My Visits” schedule page for the appropriate crew number. The “My Schedule” page allows the crew user to select their crew number to get into the page that shows their visits. Here, they will see the events that were scheduled previously as a Visit Job. They also have an option to expand and navigate to any date, in case they have to search for a very old job. Clicking on a job redirects them to the Technician/Sales job’s map navigation page.
+
+This page uses Google’s map API to show the directions from the crew user’s current location to the address given when scheduling the visit (customer’s address). The page also displays the very next step as text. Each visit job has a boolean status that indicates if the crew is at the site or left it. This page allows them to toggle this status based on where they are and what they are doing. The crew member has the option to complete the job. In case they run into a situation, say, the visit specified some problem with the shade and the crew member who got there realises there is a problem with the motor and now they need to go back to bring the necessary tools. This is a pretty common scenario, and in such cases, the crew member can mark the job as incomplete and add the appointment note that specifies what is needed and submit it, so it can be sorted out during their next visit.
+
+## 🔮 FUTURE SCOPE
+
+There is also one additional feature that was planned to be built, but it hasn’t really taken a proper shape in terms of design and implementation. This is the analytics page, and due to the fact that the organisation isn’t in immediate need of this to be implemented into their new system, it is still under planning. But in case this was decided to be built, that would be another interesting challenge to be tackled, and I will be sure to write a post about that too.
+
+The whole project has taken around 8-9 months, which includes meetings, domain research, site development, testing and changes. As of today, the project is approaching completion, which just minor changes and testings left to be done. In the upcoming articles (the 7 other parts of the project series), I will go through each of these features in detail, along with all the challenges I had to face and how I approached the problems. The links for the ones I’m done with are down below.
+
+  - Meetings and Project Kickoff – Current Post
+  - Authentication and Dashboard – *Upcoming*
+  - Customer Page – *Upcoming*
+  - Order Wizard – *Upcoming*
+  - Calendar – *Upcoming*
+  - Workstation – *Upcoming*
+  - Map Navigation – *Upcoming*
+  - Minor Features – *Upcoming*
