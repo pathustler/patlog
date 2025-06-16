@@ -10,7 +10,7 @@ type AnchorProps = ComponentProps<typeof Link> & {
   activeClassName?: string;
   disabled?: boolean;
 };
-
+ 
 export default function Anchor({
   absolute,
   className = "",
