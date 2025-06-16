@@ -1,55 +1,36 @@
-## AriaDocs - Documentation Template
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-A versatile, open-source documentation template supporting multiple frameworks.
+## Getting Started
 
-<img src="./resources/public-og.png" />
+First, run the development server:
 
-### Templates
-
-- **Next.js Base:** Full-featured documentation with SSR and SSG.  
-  [View Template](https://github.com/nisabmohd/Aria-Docs/tree/master/nextjs-base)
-
-- **Next.js Minimal:** Lightweight documentation for simple needs.  
-  [View Template](https://github.com/nisabmohd/Aria-Docs/tree/master/nextjs-minimal)
-
-- **Next.js i18n:** Multilingual support for global audiences.  
-  [View Template](https://github.com/nisabmohd/Aria-Docs/tree/master/nextjs-i18n)
-
-- **React Router Base:** Documentation with React Router Framework.  
-  [View Template](https://github.com/nisabmohd/Aria-Docs/tree/master/react-router-base)
-
-- **TanStack Start Base:** Documentation setup powered by TanStack Router.  
-  [View Template](https://github.com/nisabmohd/Aria-Docs/tree/master/tanstack-start-base)
-
-### Quick Start
-
-Create a new project:
-
-```plaintext
-npx ariadocs-cli <template> <project-directory>
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-### Deploy
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-| Template            | Deploy Link                                                                                                                                                                                                                                             |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Next.js Base        | [![Deploy](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/nisabmohd/Aria-Docs&project-name=nextjs-base&root-directory=nextjs-base)                                                                          |
-| Next.js Minimal     | [![Deploy](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/nisabmohd/Aria-Docs&project-name=nextjs-minimal&root-directory=nextjs-minimal)                                                                    |
-| Next.js i18n        | [![Deploy](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/nisabmohd/Aria-Docs&project-name=nextjs-i18n&root-directory=nextjs-i18n)                                                                          |
-| React Router Base   | [![Deploy](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/nisabmohd/Aria-Docs&project-name=react-router-base&root-directory=react-router-base)                                                              |
-| TanStack Start Base | [![Deploy](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/nisabmohd/Aria-Docs&project-name=tanstack-start-base&root-directory=tanstack-start-base&build-command=npm%20run%20build%20--%20--preset%20vercel) |
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-### Features
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-- SSR and SSG Support
-- Multiple Frameworks (Next.js, React Router, TanStack Router)
-- MDX for Interactive Docs
-- TOC with Scroll Highlight
-- Dark Mode
-- i18n for Multilingual Docs
-- Static and Dynamic Routing
+## Learn More
 
-### Support
+To learn more about Next.js, take a look at the following resources:
 
-Please consider sponsoring to keep this project alive.  
-[Sponsor Me](https://github.com/sponsors/nisabmohd)
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
