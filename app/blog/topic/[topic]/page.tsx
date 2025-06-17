@@ -27,9 +27,10 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { topic } = await params;
   console.log(topic);
+  const topiclabel = `${topic}` == "ml" ? "ML Development" : `${topic}` == "software" ? "Software Development" : topic
   return {
     title: `Blog - ${topic}`,
-    description: `Latest articles on ${topic}`,
+    description: `Latest articles on ${topiclabel}`,
   };
 }
 

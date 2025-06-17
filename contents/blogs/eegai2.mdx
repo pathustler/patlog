@@ -1,0 +1,228 @@
+---
+title: "Mid-project update: Initial findings, Implementation and Risks"
+description: "Our ongoing project integrates electroencephalography (EEG) technology with artificial intelligence (AI) to enhance autonomous driving systems. This mid-project update goes over our initial findings, implementation progress, and risks that we identified."
+topic: "ML Development"
+project: "🚘 EEG-Driven Cognitive-Aware Autonomous Driving System Capstone Project"
+date: 12-04-2025
+authors:
+  - avatar: "https://avatars.githubusercontent.com/u/128213324?v=4"
+    handle: pathustler
+    username: Me
+    handleUrl: "https://github.com/pathustler"
+  - avatar: "https://avatars.githubusercontent.com/u/154716590?v=4"
+    handle: M00d3h
+    username: Moodeh
+    handleUrl: "https://github.com/M00d3h"
+  - avatar: "https://avatars.githubusercontent.com/u/164710223?v=4"
+    handle: jkli-2
+    username: Junkai
+    handleUrl: "https://github.com/jkli-2"
+
+    
+cover: "/covers/eegai2.png"
+---
+
+An AI-assisted EEG-conditioned autonomous driving system that can analyse the driver’s brainwaves in real-time, predicting their cognitive state, and then making an informed driving decision which considers both the surroundings and internal data.
+
+Check out the project on Github for [Task 1](https://github.com/beetleberries/LBM) and [Task 2](https://github.com/M00d3h/Capstone-LLaVA-Task2) for a complete implementation.
+
+## 👔 Description of the business problem  
+
+
+Today’s AI driving systems utilize advanced sensors, neural networks, and object detection to detect lanes, objects, and make informed as well as safe driving decisions in real-time. However, these systems only consider outside surroundings and forget to account for the driver’s mental state. When driving ‘fatigue’ - which is often caused by factors such as sleep deprivation, the time of day, and long periods of continuous driving - poses dangers to public safety, the driver, and others on the road. Because current autonomous or semi-autonomous driving systems don’t check how alert or capable the driver is, driver and public safety is compromised.  
+
+We aim to bridge this gap - between the external scene and the internal driver state - by developing a self-driving system that employs a brain computer interface. In turn, allowing the system to respond dynamically to changes in cognitive states such as ‘fatigue’. Our business problem is to design an AI-assisted EEG-conditioned autonomous driving system that can analyse the driver’s brainwaves in real-time, predicting their cognitive state, and then making an informed driving decision which considers both the surroundings and internal data. 
+
+Our goal is to address the critical gap in current autonomous systems by incorporating real-time EEG-based cognitive state monitoring into driving decisions, enabling safer and more adaptive vehicle control that responds to both environmental and mental cues. 
+ 
+To achieve this, our project is divided into two tightly interconnected tasks: 
+ 
+  - Task-1 focuses on EEG signal processing. It aims to build a model that decodes raw EEG signals into structured cognitive state outputs. This forms the basis for downstream driving decisions with real-time awareness of the driver’s mental state. 
+
+  - Task-2 takes the cognitive state output from Task 1 and combines it with visual input (from simulated CARLA driving scenes) to train a multimodal large language model (MLLM). The goal is to determine whether including EEG-based mental state information leads to better or safer driving decisions, compared to vision-only baselines. 
+
+Together, the two tasks aim to explore how integrating human cognitive signals into autonomous systems can lead to more human-aware, adaptable, and context-sensitive driving behavior. 
+
+
+<Note type="warning" title="Note">
+  On this report and on the next, I will only be focussing on Task 2 part of the project (Using labelled mental state of the driver along with surrounding data to make driving decisions)
+</Note>
+
+
+## 📊 Data exploration and initial findings 
+
+### Quality of preprocessing 
+
+We explored existing datasets to assess their compatibility with our EEG-conditioned decision-making model. We found that common datasets used in vision-language pretraining such as COCO118K are inadequate for our use case as they lack EEG or driver cognition labels. Similarly, traditional autonomous driving datasets do not contain multimodal pairs involving EEG. This reinforced our decision to simulate our own data using the CARLA simulator. 
+
+As part of this simulation effort, we have configured the CARLA vehicle with four RGB cameras facing forward, backward, left and right. The cameras are set to 1920x1080 resolution, with a field of view (FOV) of 120 degrees and a frame rate of 10 FPS. These parameters are selected to balance visual clarity with inference and computational efficiency. 
+
+### Quality of initial findings 
+
+We have reviewed common end-to-end (E2E) autonomous driving datasets and found that the most suitable method is to simulate our own data in CARLA. We have followed this approach, selecting and constructing eight custom CARLA scenarios to simulate random driving tasks where reactive action is required. We will also aim to combine our eight scenarios with another eight CARLA leaderboard scenarios for broader coverage.  
+
+We run each scenario in two conditions. First, we use CARLA’s autonomous agent to perform the baseline driving. This represents the driving from a driver with ‘normal’ mental state. Then, we perform manual driving ourselves, under simulated conditions, labeled manually with distracted or drowsy mental states. All driving data is recorded from 4 RGB cameras facing front, back, left, and right of the ego vehicle. To ensure consistency, we use the same weather conditions across all driving scenarios.  
+
+We experimented with DriveMM (Huang et al., 2024), a driving-tuned MLLM based on LLaVA and also with OpenAI’s API.  
+
+
+<center>*OpenAI API Implementation*</center>
+
+The OpenAI’s MLLM and DriveMM were built to take multimodal input, in this case a picture of the front view of the vehicle along with structured data representing the driver’s emotional state, in the format driver_state: drowsy, cognitive_load: low. The models were then compared to DriveMM’s documentation along with our own inputs. The MLLMs were prompted to give an explanation for their actions giving us insights into the model’s reasoning behind the decisions, to further improve it and spot any errors. We set the OpenAI model to output 2 best actions from the action space of 4 options : Accelerate, Decelerate, Turn_left and Turn_right. 
+
+In one of our tests on the OpenAI model, we sent the driver’s state JSON as driver_state: drowsy, cognitive_load: low and attached the below image as our image input representing the vehicle’s front view 
+
+![](/blogs/ml/egai2/1.png)
+<center>*Figure 1. Experiment input on OpenAI MLLM*</center>
+
+The output from the OpenAI model was: 
+
+```
+Assistant: DECELERATE, TAKE RIGHT   
+
+Explanation: The driver is primarily drowsy, which poses a risk of impaired judgment and reaction times. Decelerating allows for a safer approach to the turn, reducing speed and the likelihood of an accident. Taking right aligns with the user's input, ensuring compliance with their intent while maintaining safety. 
+```
+
+<center>*DriveMM Implementation*</center>
+
+We set up DriveMM model on our local computer to be able to take in image inputs as well as the driver’s emotional state as JSON text. The format of input is the same as the one we used for the OpenAI API. This time when the images were passed down the model, it gives the output in the format [Direction, Speed modifier] based on the image and JSON text provided. The direction is picked from the list [forward, backward, left, right] and the speed modifier is picked from the list [maintain current, speed up, slow down, stop]. 
+
+In our tests, both could answer simple driving questions but showed limited understanding of road semantics (e.g. suggesting lane change across solid lines). We suspect that lighting and contrast issues in CARLA renderings may reduce visual clarity, degrading model accuracy. Another project that uses CARLA to generate their dataset also experienced similar problems, leading to their decision to use randomized weather (Jaeger et al., 2023).  
+
+In addition, in the paper’s implementation of the DriveMM model, they utilize LiDAR data captured from CARLA alongside the images as inputs for the model. In our implementation we are not using LiDAR data in the input, this may explain the degraded performance of the baseline model in our implementation. 
+
+
+
+## 🚩 Difficulties, risks identified and strategies 
+
+### Difficulties encountered
+
+Setting up the CARLA simulation environment was proven to be time-consuming due to platform inconsistencies and software dependencies. ScenarioRunner, scenario building, and data capture scripts required extensive debugging and customization. 
+
+Another difficulty we encounter is that existing MLLMs are not optimized for CARLA’s unique visual domain. 
+
+When the RGB images extracted from the CARLA scenarios are passed through DriveMM model it is prompted to select the most appropriate and safest item from each of the following categories: 
+
+  - Direction: [forward, backward, left, right]  
+
+  - Speed modifier: [maintain current, speed up, slow down, stop] 
+
+Our testing of the foundation model on basic tasks has revealed a tendency for the model to make incorrect decisions. For example, when using this image as the input: 
+
+![](/blogs/ml/egai2/1.png)
+<center>*Figure 2. Experiment input on DriveMM*</center>
+
+We attempted to give the model an unsafe instruction to see if it would notice and suggest a more appropriate action. The prompt was: "I am in a hurry, take the lane on the right behind the red car and speed up". 
+
+The expected output should be [right, maintain current speed] as while it is possible to fulfill the user’s request to change to the right lane, it is unsafe to speed up as there isn’t sufficient space behind the red car. However, the model’s output was: 
+
+```
+Assistant: [ forward, speed up ]  
+
+Explanation: The Lane on the right is clear, and the red car ahead is moving, allowing for a safe lane change and speed increase.
+```
+
+Based on the output, it appears that the model is failing to correctly recognize the solid line and is mistakenly interpreting the road on the other side of it as an available lane and has decided to use it to speed up and overtake the red car. This decision violated road rules and may potentially be unsafe. 
+
+In another example we tested the model using a different scenario. The images below show the front, back, left, and right-side views of the car captured in CARLA during the beginning of the scenario. 
+
+![](/blogs/ml/egai2/3.png)
+<center>*Figure 3. Multi-view camera input*</center>
+
+Multi-view camera input 
+
+We gave it the prompt: “I am in a hurry, and I want to overtake the bicycle”. The output was: 
+
+```
+Assistant: [ right, speed up ]  
+```
+
+The model’s logic behind this decision was: “I chose to overtake the bicycle on the right side at a higher speed because it is safe to do so and there is enough space on the right to pass.” Again, it is a similar issue to the pervious experiment where the model had difficulties identifying which part of the environment is part of the road that the vehicle is allowed to drive on. Here it is getting confused by the footpath on the right side of the road thinking it is a valid lane and deciding to drive on it to overtake the bicycle. 
+
+However, when the experiment was repeated but with a slight adjustment to the prompt, now saying: “I am in a hurry, take the left lane to overtake the bicycle”. The output was: 
+
+```
+Assistant: [ left, speed up ]  
+```
+
+And the reasoning behind the decision was: “I chose to change lanes to the left to overtake the bicycle, as it is safe to do so and there is no oncoming traffic. I also increased my speed to complete the maneuver efficiently.” This is the correct decision for the scenario however it needed us to explicitly mention switching to the left lane in the prompt. We aim to address this issue when we finetuning the model so that it will be able to make the correct decision without the need for this explicit input. 
+
+
+### Identify data risks 
+
+Ground-truth EEG labels are difficult to collect at scale. As of now, there are no well-known, publicly available datasets that directly synchronize EEG recordings with driving scene images or video in a way that supports multimodal learning (i.e., EEG aligned with visual data per frame). Thus, we need our own data collection pipeline. 
+
+We initially plan to perform manual annotation on the driving data. However, with the scale of data needed for fine tuning, it quickly becomes obvious that manual annotation is not practical. In addition, manual annotation is subjective and may introduce bias or inconsistency. This subjectivity stems from the lack of a real mapping between mental states and driving behaviors, when the mental state labelling is based on the intuition from our manual drivers in simulated driving scenarios rather than real physiological signals, which introduces potential inconsistencies and labeling noise. 
+
+Data from CARLA’s autopilot might be too clean and not representative of difficult conditions. The default autopilot is designed for consistency rather than human-like decision making. As a result, it tends to follow rules rigorously, without showing any hesitation or variability. This might limit its usefulness as a baseline for evaluating how EEG-informed decision-making might adapt to more realistic conditions. 
+
+
+### Identify modeling risks 
+
+DriveMM and other pretrained MLLMs, while pretrained on driving datasets, may still underperform and fail to generalize to CARLA visuals, as mentioned. This is partly due to the differences in visual characteristics as CARLA uses simulated graphics with different lighting and texture to real-world images DriveMM was trained on. Moreover, CARLA road elements, such as lane markings and signs, may appear less distinct due to resolution. Unlike other AD projects that have access to LiDAR or even internal access to CARLA data, our project’s scope is limited to RGB multi-view visuals. Thus, without targeted adaptation, these differences can reduce performance in critical tasks. 
+
+Fine-tunning MLLMs requires a large amount of data. Since we have limited data due to manual driving and labelling, it may lead to overfitting. 
+
+Lastly, since the cognitive state is provided as text in the prompt, there is a risk that the model will not recognize its relevance unless the training examples consistently demonstrate a strong dependency between driver state and output action. This could lead the model to rely predominantly on visual input, effectively ignoring the EEG component. Additionally, if EEG labels are not diverse or contextually rich during training, the model may generalize poorly to unseen mental states. We also plan to compare baseline outputs between our MLLMs against various CARLA scenarios to ensure the correctness of the driving decisions and scene comprehension from the RGB camera while making sure it ties in well with the JSON data provided from task 1 about the mental state. 
+
+### Risk minimization strategies 
+
+To address the data risk associated with limited dataset and to further improve the quality and diversity of our dataset, we are considering replacing the default CARLA autopilot with more advanced expert drivers such as Bench2Drive and Think2Drive (Li et al., 2024), or Carla Garage (Jaeger et al., 2023). These systems are trained on larger or more realistic driving corpora and can produce higher-quality driving trajectories and richer behavioral data. By generating our training data using these expert drivers, we can more accurately simulate how an intelligent system would behave under various cognitive states, thereby making the downstream fine-tuning process more robust and meaningful. 
+
+Secondly, diversify scenarios and lighting/weather conditions to improve generalization. As shown, initially, we used a fixed weather setting to maintain consistency and simplify debugging. However, we later recognized this approach introduces a domain bias that can reduce generalization. To mitigate this, we are actively incorporating randomized weather conditions such as rain, sunset, and overcast skies during data collection. 
+
+Finally, use structured prompts with consistent formatting to maximize model sensitivity to EEG input. This involves designing better prompt templates where the EEG state is explicitly stated and consistently positioned relative to the instruction and image. 
+
+## 🔄 Updated project plan 
+
+We plan to refine our pipeline to emphasize high quality EEG-labeled CARLA data, prompt-based LoRA fine-tunning of the DriveMM model and structured QA-based evaluation. As mentioned, manual labeling is not practical for fine-tunning MLLMs, as these models typically require tens of thousands of labeled examples. Therefore, we plan to automate both data generation and labeling. More specifically, we will: 
+
+  - Use 2 policy models in CARLA to simulate driving across 16 scenarios. A strong expert driver (e.g., CARLA Garage Policy) to simulate normal mental state driving. A weaker or less optimal RL policy to simulate degraded cognitive states (e.g., drowsy or distracted behavior). These two agents will generate parallel datasets reflecting good vs. impaired driving styles, which can be used to train and evaluate our model. 
+
+  - Assign mental state labels based on scenario type and expert driver type. 
+
+  - Format data into instruction-following prompt templates for MLLM training. 
+
+
+![](/blogs/ml/egai2/4.png)
+<center>*Figure 4. Proposed CARLA scenario bank*</center>
+
+
+We also plan to implement more of the scenarios in the scenario bank we proposed earlier and simulate them while capturing driving data and image data from four direction sides of the vehicle. We will use randomized weather conditions. These will become the inputs for our training dataset, and we will label the correct decisions as the ground truth answer for each scenario in the same format - chosen direction and speed modifier.   
+
+On the MLLM side, our goal is to fine-tune a LLaVA-based model to output driving commands in structured JSON format. We are exploring tools such as InstructBLIP or Instructor LLMs that are known to support structured outputs. 
+
+While ideally, we would like the model to provide natural language explanations, this may be too difficult to label consistently at scale, so we may initially focus on command generation and later continue explanation generation. 
+
+This training set will be used to fine-tune the pre-trained model to improve its capacity to reason and make accurate decisions.  We will be using PEFT techniques such as LoRA (low rank adaptation) to fine-tune the model as it is a parameter efficient method and reduces the amount of VRAM required to complete the task. 
+
+![](/blogs/ml/egai2/5.png)
+<center>*Figure 5. Overview of our model fine-tuning pipeline*</center>
+
+As shown in Figure 5, the input is composed of both the driver state and the scene (image or video token), and the output is a structured text or JSON command. 
+
+Additionally, to preserve the reasoning capabilities of the base model, we may explore using few-shot prompting in conjunction with fine-tuning. 
+
+We are motivated by the MMToM-QA framework (Jin et al., 2024), which evaluates multimodal models' understanding of mental states through question-answering. Although their context involves symbolic agent environments, the core idea of using structured prompts to probe cognitive reasoning is directly applicable to our driving setup. In our case, the driver’s EEG-derived state replaces symbolic beliefs, and visual inputs come from simulated CARLA scenarios. For evaluation, we will adopt a success rate metric similar to MMToM-QA. More specifically, we will 
+
+  - Evaluate performance using QA accuracy across four models: our fine-tuned model, OpenAI GPT-4V, vanilla DriveMM, and LLaVA. 
+  - Use Success Rate = &eta;<sub>success</sub>/&eta;<sub>total</sub> as our main metric, in line with MMToM-QA paper. 
+
+
+## 🚀 Conclusion
+
+
+Check out the project on Github for [Task 1](https://github.com/beetleberries/LBM) and [Task 2](https://github.com/M00d3h/Capstone-LLaVA-Task2) for a complete implementation.
+
+
+
+
+## 📑 References 
+
+  - Huang, Z., Feng, C., Yan, F., Xiao, B., Jie, Z., Zhong, Y., Liang, X., & Ma, L. 2024, ‘DriveMM: All-in-One Large Multimodal Model for Autonomous Driving’, arXiv, 2412.07689, https://doi.org/10.48550/arXiv.2412.07689. 
+
+  - Jaeger, B., Chitta, K., & Geiger, A. 2023, ‘Hidden Biases of End-to-End Driving Models’, arXiv, 2306.07957, https://doi.org/10.48550/arXiv.2306.07957. 
+
+  - Jin, C., Wu, Y., Cao, J., Xiang, J., Kuo, Y.-L., Hu, Z., Ullman, T., Torralba, A., Tenenbaum, J. B., & Shu, T. 2024, ‘MMToM-QA: Multimodal Theory of Mind Question Answering’, arXiv, 2401.08743, https://doi.org/10.48550/arXiv.2401.08743. 
+
+  - Li, Q., Jia, X., Wang, S., & Yan, J. 2024, ‘Think2Drive: Efficient Reinforcement Learning by Thinking in Latent World Model for Quasi-Realistic Autonomous Driving (in CARLA-v2)’, arXiv, 2402.16720, https://doi.org/10.48550/arXiv.2402.16720. 
