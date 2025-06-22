@@ -1,0 +1,168 @@
+---
+title: "Deployment, Authentication and Dashboard"
+description: "Addressing my approach to building the authentication and dashboard of the web app, which is one of the first few features we decided to knock out. It was also one of the fundamental features over which the rest of the pages were built."
+topic: "Software Development"
+project: "☀️ One shade at a time (OSAAT)"
+date: 29-01-2025
+authors:
+  - avatar: "https://avatars.githubusercontent.com/u/128213324?v=4"
+    handle: pathustler
+    username: Me
+    handleUrl: "https://github.com/pathustler"
+
+    
+cover: "https://stagmoney.com/wp-content/uploads/2025/01/2-1.png"
+---
+
+“One Shade At A Time” ([OSAAT](https://ossat.azurewebsites.net/)) is a management system website I built for SWSunControl, a company based in Arizona that builds sunshades. This system is designed to make things easier for the team by keeping everything in one place—customers, calendar events, orders, workstation processes, etc.
+
+This is the second part of an eight-part series. In the previous post, we saw how the meetings and communication took place, along with the research that helped us decide on all the different tools we used to build the system. In this article, I will address my approach to building the authentication and dashboard of the web app, which is one of the first few features we decided to knock out. It was also one of the fundamental features over which the rest of the pages were built. I will also show you how the site was deployed on Azure with Django and how we used git for version control before everything started.
+
+I was told to start with the building in June 2023. Around this time, we had a pretty good idea about what we were going for, with all the designs and mockups in hand, it was time to start.
+
+
+## 🚀 DEPLOYMENT
+
+![](https://stagmoney.com/wp-content/uploads/2025/01/Screenshot-2025-01-27-at-6.00.40%E2%80%AFPM.png)
+
+As we discussed in the previous post, the project was built using Django, and the backend using MSSQL. The front end utilizes JavaScript, HTML, and CSS for the front end, specifically TailwindCSS for styling. The company also bought a Wasabi Storage bucket for storing all the customer files and gallery images that will be used in the system, so that needed to be connected to the Django project too.
+
+### Setup Django App for Deployment
+
+One of the first steps for this was to add the domain along with the localhost IP in ```ALLOWED_HOSTS``` inside settings.py. This should allow the Django project to show up when entering the domain, as well as when using localhost, allowing debugging and development. I already had a Django app named main setup inside the project.
+
+After setting up ```STATIC_ROOT``` and ```MEDIA_ROOT```, it was time to create the GitHub repository. The repository was then connected to the Django project, and before pushing my changes, I created the requirements.txt using the pip command on my terminal.
+
+Once this was done, an Azure web app was created, with the latest version of Python (the one that was being used in the Django project) as the runtime stack. An MSSQL database was also hosted on Azure for the backend of the system.
+
+### Setup Database and Storage bucket on Django
+Back in settings.py, the database’s configurations were set for the MSSQL database that we just hosted on Azure. Since this was the first time I was working with MSSQL, I did run into a few issues when dealing with the “ODBC Driver” for MSSQL. After a few hours of debugging, I found that installing a few packages and adding a certain parameter inside the ```DATABASES``` configuration did the trick.
+
+
+### Using Git for CI/CD
+
+A GitHub repository was already created, all that had to be done was make a yml workflow file inside .github/workflows. This allows us to run a few commands every time there’s a push, which also involves the deployment of the project on the live site.
+
+At this point, the project was ready to get into the development phase. Any code for the week’s feature was written on my computer. The Django project was run locally to make sure everything worked smoothly, and once done, it was pushed to GitHub from my terminal, and then automatically deployed on the Azure web app (live site). This was usually done once or twice a week before the Tuesday Meetings where I presented my screen showing how it worked. This allowed James to later test out the feature from the live site and let me know of any changes he would like.
+
+At this point, the website was just 1 page that threw an HTTP response saying “Deployment worked”. From here, we started to build each part of the site, starting from the Login Page.
+
+## 🔐 LOGIN PAGE
+
+![](https://stagmoney.com/wp-content/uploads/2025/01/Screenshot-2025-01-27-at-8.04.24%E2%80%AFPM-2048x1218.png)
+<center>*Mockup of the Login Page created by Amanda from OSAAT*</center>
+
+Just like a typical login page, there are two fields – username and password. There is no sign-up button since the company doesn’t want anonymous users to be able to create a user account and access their system. New accounts will be created by admins, manually, on the Django administration portal (we will get there in a bit).
+
+|   Feature  | Description |
+| ---------- | ----------- |
+| Login | Entering the username and the right password redirects to Dashboard |
+| Forgot Password | There is an option where you can reset your password for your account by clicking on the “Forgot your password” link. |
+
+
+First, we create the URLs for the views
+
+1. LoginView
+2. LogoutView
+3. PasswordResetView
+4. PasswordResetDoneView
+5. PasswordResetConfirmView
+6. PasswordResetCompleteView
+
+
+### Login
+
+All these views can directly be implemented to the URL by importing ```django.contrib.auth```. Except for the LoginView, everything else had nothing more to it. I created the templates folder, within which I created the registration folder, to put in all the HTML pages for the views in the above-mentioned URLs.
+
+The reason why I avoided creating my own views and pages for implementing this is because the use of tokens when it came to password reset was very important. Security was one of the improvements that was expected in the new system compared to the old one. Django’s inbuilt library provided all the tools necessary to work with the User and Authorization part of the web app. With a little research, using this tool within the project became a breeze.
+
+### Forgot Password
+
+As for the password reset function, I used the Office365 SMTP credentials in settings.py which allowed sending emails to accounts from OSAAT mail id, where the email contained a message linking the reader to a URL with token, to a page within the web app that allows the user to enter the new password twice to reset it.
+
+
+|     |  |
+| ---------- | ----------- |
+| ![](https://stagmoney.com/wp-content/uploads/2025/01/Screenshot-2025-01-27-at-6.18.25%E2%80%AFPM-2048x1304.png) | ![](https://stagmoney.com/wp-content/uploads/2025/01/Screenshot-2025-01-27-at-8.07.39%E2%80%AFPM-768x542.png) |
+| ![](https://stagmoney.com/wp-content/uploads/2025/01/Screenshot-2025-01-27-at-8.17.03%E2%80%AFPM-695x256.png) | ![](https://stagmoney.com/wp-content/uploads/2025/01/Screenshot-2025-01-27-at-8.16.17%E2%80%AFPM-695x491.png) |
+
+But, Django’s login page was pretty bland and certainly did not look like the UI design that was provided to me. Therefore, I added styling to the page to make it look more like the mockup. With this, we finished up with the login pages that can redirect the user to the dashboard when the right password is entered and also give them the option to enter their email ID where an automated email is sent for password reset.
+
+Finally, it’s time to build the dashboard – the page that opens up with the user enters the right password. It still throws the HTTP response “Deployment worked”, time to change that.
+
+## 🏠 DASHBOARD
+
+![](https://stagmoney.com/wp-content/uploads/2025/01/Screenshot-2025-01-28-at-2.01.39%E2%80%AFAM-2048x1266.png)
+<center>*Mockup of the Dashboard Page created by Amanda from OSAAT*</center>
+
+The dashboard is an aggregation of different buttons that allows the user to navigate to different parts of the site. The website’s base URL (if the user is logged in) should open up this page.
+
+|   Feature  | Description |
+| ---------- | ----------- |
+| Sidebar | Sidebar should be standard for almost all the pages (except in production workstation and pages that take up all the horizontal space). Should display the user’s name along with the current date and time in Mountain Standard Time (MST). |
+| Global Search | This is a searchbar that lives in the sidebar. |
+| Dynamic button display | There are buttons on the homepage - ADP, New Order, View Orders, Add Customer, Employee Directory, Calendars, Dealer Resources, Sun Control, Reports, Image Gallery, My Visits, Video Gallery. Each of these buttons must be hidden or shown depending on the role/permissions that has been assigned to the user. |
+
+
+### Sidebar
+
+Firstly for the **sidebar**, I created a file named layout.html inside a folder named main within the templates directory. The plan is to put in any HTML page within the main app, that belong to the overall main part of the site. layout.html contains the code for the sidebar, so that it can easily be used with any page by using the ```extends``` tag.
+
+### Global Search
+
+Next, I created a simple URL pattern in urls.py that points to the search view. Here we try to retrieve a GET request for the search query and then simply point to an html page named search.html. Right now the view points to an empty page with the default sidebar layout on it, meaning it doesnt do anything. Entering anything into the global search field on the sidebar is going to trigger a JavaScript function, which will pull the URL for the global search.
+
+<Note type="warning" title="Note">
+  The global search feature will be covered in detail in the last post of the OSAAT Documentation Series – “Minor Features”. As it contained searching Customer and Order fields, this was implemented later in the development journey. Feel free to check it out!
+</Note>
+
+
+### Dynamic button display
+
+There are 2 types of users on the surface – dealer users and internal staff users. A dealer user always has a customer object linked to them. Not all customers have a user account, since the internal staff in OSAAT do the order placement and event scheduling for few customers without creating a seperate login for them. For those customers who do have login access, they’re known as dealer users, and the buttons on the dashboard would look compleltely different from how they would for an internal staff.
+
+![](https://stagmoney.com/wp-content/uploads/2025/01/Screenshot-2025-01-29-at-2.55.07%E2%80%AFAM-2048x1153.png)
+
+
+Features Available to a dealer user:
+1. New Order
+2. View Orders
+3. Dealer Resources
+4. Sun Control
+5. Image Gallery
+6. Video Gallery
+
+![](https://stagmoney.com/wp-content/uploads/2025/01/Screenshot-2025-01-29-at-2.54.46%E2%80%AFAM-2048x1153.png)
+
+Features Available to an admin (an internal staff with all the permissions)
+1. ADP
+2. Add Customer
+3. Employee Directory
+4. Calendars
+5. Dealer Resources
+6. Sun Control
+7. Reports
+8. Image Gallery
+9. My Visits
+
+For users who come under internal staff, they are manually given permissions to view each of the 9 features for internal staff users. Unless of course, if they’re an admin, in which case, they see all 9 buttons like you see on the image above. To acheive this, I made use of django groups where a group was created for each of these 9 buttons. Addionally, 2 more groups were created – “Admin” and “Dealer”.
+
+Inside templates/main/index.html, layout.html was used, which contained the sidebar. Buttons were created in different colors, and the icons given to me were added. Each one linked to an empty url path. But that was fine, the idea is to add the page url to the index page was we build them, so for now the dashboard was looking and working great.
+
+Inside views.py, in the index view, I get all the group names that were given to the user and pass it into the HTML template. Here, based on the group name, I used if conditions to either show or not show each of the buttons. If the user has a group named “ADP” in the grouplist, the “ADP” button was shown, and if not, the button wont live in the user’s dashboard. In case the group name would be “Dealer”, all 6 dealer buttons were shown. Similarly for “Admin”, all 9 admin buttons were shown irrespective of other group names assigned to them.
+
+With this, the dashboard was capable of displaying buttons dynamically based on the groups the user belongs to.
+
+
+## 🔮 NEXT STEPS
+
+This post is the second part of the whole project documentation series. In the next article, I will go through all the Customer pages and how I used wasabi storage to save and keep track of all the order and gallery files for each customer. Feel free to use the links down below to read about any part of the project you are interested in. I’ll see you on the next post!
+
+  - [Meetings and Project Kickoff](https://patlog.vercel.app/blog/OSAAT1)
+  - Deployment, Authentication and Dashboard – **Current Post**
+  - Customer Page – *Upcoming*
+  - Order Wizard – *Upcoming*
+  - Calendar – *Upcoming*
+  - Workstation – *Upcoming*
+  - Map Navigation – *Upcoming*
+  - Minor Features – *Upcoming*
