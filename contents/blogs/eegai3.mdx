@@ -1,0 +1,202 @@
+---
+title: "Final Report: Findings, Evaluation and Deployment"
+description: "Our project integrates electroencephalography (EEG) technology with artificial intelligence (AI) to enhance autonomous driving systems. This final report goes over our initial findings, evaluation, deployment and lessons that we learned."
+topic: "ML Development"
+project: "🚘 EEG-Driven Cognitive-Aware Autonomous Driving System Capstone Project"
+date: 14-05-2025
+authors:
+  - avatar: "https://avatars.githubusercontent.com/u/128213324?v=4"
+    handle: pathustler
+    username: Me
+    handleUrl: "https://github.com/pathustler"
+  - avatar: "https://avatars.githubusercontent.com/u/154716590?v=4"
+    handle: M00d3h
+    username: Moodeh
+    handleUrl: "https://github.com/M00d3h"
+  - avatar: "https://avatars.githubusercontent.com/u/164710223?v=4"
+    handle: jkli-2
+    username: Junkai
+    handleUrl: "https://github.com/jkli-2"
+
+    
+cover: "/covers/eegai3.png"
+---
+
+
+
+## 📄 Executive Summary 
+
+This research project explores a unique approach to autonomous driving by bridging the gap between external perception and internal cognitive state awareness. To manage the complexity of this project the workload was divided into two tasks between the six group members. Task-1 focused on developing a pipeline capable of accurately decoding a driver’s mental state - ‘alert’, ‘transition’, or ‘drowsy’ - from raw EEG signals. On the flipside, Task-2 evaluated whether incorporating this mental state data into a multimodal planning model improves driving safety or introduces trade-offs in decision accuracy. 
+
+For Task-2, we finetuned the DriveMM model and evaluated it by generative driving actions and justifications with EEG cognitive states included in the evaluation set. The evaluation was dual approach by using cosine similarity via MiniLM and GPT for accessing the similarity in decision. Modern autonomous driving systems struggle in certain scenarios due to limited awareness of driver’s cognitive state.  
+
+In this task, by including the driver’s cognitive state in decision making, we created a more human-aligned, cautious autonomous driving agent. The baseline model with the ‘text-only’ output performed quite well and there was a reduction in the score when the input was multimodal. The finetuned model generated more scenario-aware decisions and delivered results that met our expectations. Moving forward, we would like to expand the dataset to include diverse cognitive states or use real EEG embeddings instead of discrete tokens. Also, replacing the JSON interface with real-time end-to-end multimodal fusion between the EEG data and visual inputs is recommended.  
+
+
+## 👔 Business Problem 
+
+Current autonomous driving systems rely heavily on the data from the surroundings interpreted from computer vision and other sensors to make driving decisions (e.g. Huang et al., 2024, Renz et al., 2024). However, they tend to overlook the driver’s mental and cognitive states that are crucial to making decisions for the driver. For example, drowsiness is one such issue that can significantly impair reaction time and decision-making for the driving, posing a risk to both the driver and other people on the road.  
+
+Our project aims to bridge this gap between the external scene and the internal driver state by building a self-driving system that predicts the driver’s mental state using BCI (Brain Computer Interface). Our business model analyses the driver’s brainwaves in real-time and predicts the cognitive state using which we make a driving decision that also involves data from the external surroundings.  
+
+Our goal is to address this significant gap in current autonomous driving systems by implementing a real-time EEG-based cognitive state monitoring into driving decisions, allowing a safer and adaptive driving experience. 
+
+To do this, our project is being split into two integrated tasks: 
+
+- **Task-1** focuses on EEG Signal processing where we aim to build a model that decodes raw EEG signals from the ego driver into structured output that represents the cognitive state. This real-time mental state decoding allows the driving system to remain aware of the driver’s mental state and attention. 
+
+- **Task-2** focuses on Multimodal integration with driving with cognitive state output from Task 1 and visual input (simulated driving scenes from CARLA) to train the multimodal large language model (MLLM). The goal is to implement this and determine whether including EEG-based mental state information leads to better or safer driving decisions compared to traditional autonomous driving systems. 
+
+Together, the two tasks aim to develop and explore an autonomous driving system that integrates human cognitive signals, creating more human-aware, adaptable, and context-sensitive driving behaviors. 
+
+<Note type="warning" title="Note">
+  On this report, I will only be focussing on Task 2 part of the project (Using labelled mental state of the driver along with surrounding data to make driving decisions)
+</Note>
+
+
+## 📊 Data Exploration 
+
+
+<center><u>*Task-2: LLM Decision Integration - Dataset*</u></center>
+
+In task 2, we focused on integrating the driver’s cognitive state with driving scenarios to train our driving model. By conditioning the model on neurophysiological inputs, we aim to move toward cognitive alignment, where the AD system can make contextually appropriate decisions that are sensitive to the driver's current mental state. 
+
+Task 2 utilizes multiple multimodal data sources: 
+
+- **Simulated Driving Data.** It was generated using the CARLA simulator with predefined scenarios and customized scenarios and annotated using PDM-lite (citation) as the expert planner. 
+
+- **Simulated Cognitive States.** To compensate for the lack of real-time EEG-driving data, we simulate cognitive states through heuristics like visual input occlusion and later through a LLM (GPT-4 from OpenAI). 
+
+- **LingoQA Dataset:** Provides annotated video-question-answer pairs, allowing language model fine-tuning with grounded natural language explanations. 
+
+To realistically collect large-scale, controllable driving data, we leverage the CARLA simulator, which allows for flexible creation of structured, diverse traffic environments that mirror real-world complexity. We first built a scenario bank containing various driving situations such as pedestrian crossings, occlusions, and lane merges, which designed to test planning and behavioural responses under different conditions. 
+
+During development, we integrated a toolkit called PDM-lite, which significantly accelerated our data collection process. PDM-lite provides a rule-based expert planner that can navigate these scenarios autonomously while generating synchronized driving logs. This includes RGB camera feeds, simulator metadata (e.g., ego vehicle telemetry, object tracking), and optional LiDAR data for future expansion. Using PDM-lite ensures our dataset is grounded in consistent and explainable driving behaviour, enabling us to benchmark our cognitive-aware LLM planner against a robust reference policy. 
+
+To simulate cognitive states, we generated a dataset with labels from OpenAI API. We began by designing custom driving scenarios involving occlusions along with corresponding EEG cognitive state labels from Task-1. Since there was no existing dataset that contained all these information with reliable ground truth decisions, we used OpenAI’s API (GPT-4) to generate the ground truth driving actions for the scenarios we designed. 
+
+
+![](/blogs/ml/eeg3/01.png) <center>*Figure 1.  Ground truth generated by OpenAI*</center>
+
+We created a structured prompt that ensured consistency across all the samples that were created. OpenAI API was used to: 
+
+- Generate ground truth action decision with a structure for an ideal response being set to the format [direction_change, speed_change]. Direction change must be one item from the list: ["forward", "backward", "left", "right"], and speed change must be one item from the list: ["maintain current", "speed up", "slow down", "stop"]. 
+
+- Generate an explanation for the decision. 
+
+- A decimal between 0 to 1 representing the confidence score in the decision being taken. 
+
+## Modelling 
+
+<center><u>*Task-2: LLM Decision Integration - Modelling*</u></center>
+
+We fine-tune a pretrained Multi-Modal Large Language Model based on DriveMM (Huang et al., 2024) which is built on LLaVA to serve as both a planner (outputs discrete driving actions such as Stop, Left) and an explainer (outputs natural language justifications for its decisions).
+
+
+![](/blogs/ml/eeg3/02.png) <center>*Figure 2.  Task 2 Model Architecture*</center>
+
+Inputs 
+
+    - Visual Input: Image of the current scene. 
+
+    - Cognitive Input: Text token (e.g., “Driver state: Drowsy”).  
+
+    - Optional Prompt: "What should the vehicle do?" + few-shot examples.
+
+Training Strategy 
+
+    - Fine-tuned using LoRA (Low-Rank Adaptation) for efficiency. 
+
+    - Loss functions include: 
+
+    - Cross-entropy for action output. 
+
+    - Language modelling loss for explanation generation. 
+
+    - Fine-tuned on LingoQA (Marcu et al., 2024) using 30,000 samples from the scenery dataset and 20,000 samples from the action dataset. The Scenery dataset trains the model to understand the surrounding environment and identify objects like street signs, roads, pedestrians and the action dataset trains the model to make safe driving decisions. 
+
+
+## 🔍 Findings  
+
+<center><u>*Task-2: LLM Decision Integration - Evaluation Strategy*</u></center>
+
+To evaluate the performance of our EEG-conditioned driving model, we employed a two-pronged evaluation framework designed to accommodate both structured and unstructured outputs. The model was expected to generate a driving action (e.g., "forward", "speed up") and an associated explanation conditioned on environmental and EEG features. However, due to variability in the model’s output likely due to the limitation of LLaMA, some predictions were valid JSON objects, while others were unstructured free-form text. Thus, we applied different evaluation methods for each component. 
+
+For evaluating the explanations, we used cosine similarity between sentence embeddings generated using Sentence-BERT. This allows us to assess the semantic alignment between the model's explanation and the ground truth rationale, capturing meaning beyond surface-level phrasing. 
+
+For the actions, which varied between structured JSON arrays and actions embedded in text, we used a large language model (ChatGPT) to act as a semantic evaluator. Given a prompt containing both the predicted and ground-truth actions, the model assigned a similarity score from 0 to 100 and provided a brief justification. This approach offers the flexibility to handle noisy outputs and ensures a more human-aligned evaluation of decision-making accuracy. 
+Additionally, we also used a small-scale transformer-based language model called all-MiniLM-L6-v2 to evaluate the semantic consistency in the reasoning behind the driving decisions based on cosine similarity.
+
+
+![](/blogs/ml/eeg3/03.png) <center>*Figure 3.  Task 2 Model evaluation result*</center>
+
+
+<center><u>*Baseline model*</u></center>
+
+The baseline DriveMM model performed moderately well on our evaluation dataset, with a cosine similarity value of 0.6291. The model also received a score of 61 in OpenAI’s semantic evaluation test. 
+
+<center><u>*Finetuned model*</u></center>
+
+After finetuning the model, we performed the evaluations once again. The finetuned DriveMM model delivered impressive results, with a cosine similarity value of 0.7676, and a score of 75 in OpenAI’s semantic evaluation test. 
+
+Based on the evaluation results and our observations, for the baseline DriveMM model, the MLLM without cognitive state input makes visually plausible decisions but sometimes overly optimistic in occluded or uncertain scenes. After the simulated EEG state integration, the model: 
+
+    - Slows down or stops more frequently in drowsy-state simulations. 
+
+    - Provides clearer and more cautious justifications. 
+
+
+## 🚩 Difficulties Encountered 
+
+<center><u>*Task-2: LLM Decision Integration*</u></center>
+
+Throughout the development of Task-2, we encountered several difficulties that changed the scope and objective of the task. A major limitation was the lack of a large-scale EEG-driving paired dataset, which forced us to rely on simulated cognitive states, using different techniques to simulate driver fatigue or distraction. While effective for experimentation, this approach lacks the nuance of real EEG data. 
+
+Another key challenge was data annotation. Constructing mental-state and driving QA pairs for training would require significant manual effort. To address this issue, we used GPT via OpenAI’s API to generate initial annotations, but quality control and alignment with our format still demanded human oversight. 
+
+Additionally, the current architectural separation between Task-1 and Task-2 which is connected via a JSON-based interface limits the potential for deeper, real-time interaction between EEG signal processing and the LLM’s reasoning. This modular design prevents true end-to-end optimization, which could be addressed in future iterations through latent space alignment or tighter embedding integration. 
+
+Compounding these issues, we observed a formatting regression in the MLLM outputs post-fine-tuning. Although the baseline model returned incorrectly formed JSON occasionally, the fine-tuned model often ignored the structured output format entirely likely due to the training on natural language datasets like LingoQA and produced free-form text. While this disrupted our API pipeline, it also indicated that the model was generating richer, more contextually aware explanations, suggesting improved reasoning and environment understanding. 
+
+## 🚀 Deployment 
+
+For integration with simulators like CARLA, the model could be wrapped into a Python API that takes RGB frames and driver cognitive state as inputs and returns both a driving action and a natural language explanation. In future real-world applications, these explanations could be displayed on an in-vehicle infotainment screens or heads-up display to provide transparency for driver assistance systems or for debugging. 
+
+## 💬 Recommendations  
+
+From task 2’s perspective, we recommend several enhancements to improve the whole system’s performance and realism across different phases. In the short term, the dataset should be expanded to include more nuanced cognitive state labels, such as stress, distraction, or confusion, to better reflect the spectrum of real driver conditions.  
+
+Additionally, incorporating temporal context by allowing the model to access scene memory from prior frames could improve decision consistency and robustness. In the medium term, rather than feeding cognitive state as a discrete token, we recommend using real EEG embeddings from Task 1 as soft conditioning vectors, allowing the LLM to adjust its internal reasoning in a more fine-grained manner.  
+
+Finally, for the long term, we envision replacing the current JSON-based interface with a shared latent space, enabling direct alignment between the EEG model and LLaVA. This would allow for end-to-end multimodal fusion, possibly through mechanisms like multi-head attention layers that dynamically integrate both visual and neural inputs in real time, bringing the system closer to a fully integrated, end-to-end, and cognitively aware driving agent. 
+
+## 🔮 Future Work and Lessons learned
+
+Dividing the whole project into Task-1 (EEG representation learning) and Task-2 (LLM-driven driving model) allowed each sub-team to focus on specialized goals, but this separation also introduced coordination challenges. We learned that close synchronization, especially about interface design, data formats, and timing assumptions is crucial to avoid integration issues. For example, while Task 1 output structured JSON containing cognitive states, Task 2 initially expected a different schema, causing friction. Going forward, we recognize the value of shared milestones, cross-task testing, and early interface contracts to ensure smooth modular integration in research pipelines. 
+
+Another lesson we have learned while simulating “normal” driving behaviour is that it is relatively straightforward to achieve using a competent rule-based expert planner like the one we used PDM-lite. However, simulating impaired cognitive states such as drowsiness proved to be much more difficult. We experimented with using a weaker driving model to represent a “worse” driver, but its erratic or unnatural behaviour did not produce meaningful contrast for testing cognitive-aware driving system. It highlighted an insight for us, that proxies for human impairment are difficult to model, and without real physiological signals, our ability to emulate impaired cognitive driving performance remains fundamentally constrained. This also highlighted the importance of integrating real, high-fidelity cognitive data. 
+
+
+## 📑 References 
+
+
+    - Huang, Z., Feng, C., Yan, F., Xiao, B., Jie, Z., Zhong, Y., Liang, X., & Ma, L. (2024). DriveMM: All-in-One Large Multimodal Model for Autonomous Driving (No. arXiv:2412.07689). arXiv. https://doi.org/10.48550/arXiv.2412.07689 
+
+    - Marcu, A.-M., Chen, L., Hünermann, J., Karnsund, A., Hanotte, B., Chidananda, P., Nair, S., Badrinarayanan, V., Kendall, A., Shotton, J., Arani, E., & Sinavski, O. (2024). LingoQA: Visual Question Answering for Autonomous Driving (No. arXiv:2312.14115). arXiv. https://doi.org/10.48550/arXiv.2312.14115 
+
+    - Renz, K., Chen, L., Marcu, A.-M., Hünermann, J., Hanotte, B., Karnsund, A., Shotton, J., Arani, E., & Sinavski, O. (2024). CarLLaVA: Vision language models for camera-only closed-loop driving (No. arXiv:2406.10165). arXiv. https://doi.org/10.48550/arXiv.2406.10165 
+
+
+
+## Appendix – Task 2 Code Repository 
+
+The source code for Task 2, including CARLA simulation scenarios, data collection, and expert driving agent, is available at the following repositories: 
+
+    - CARLA Scenarios: https://github.com/jkli-2/scenario_runner_capstone 
+
+    - CARLA data collection toolkit and expert: https://github.com/jkli-2/DriveLM/tree/DriveLM-CARLA 
+
+    - Fine-Tuning and inference scripts: https://drive.google.com/drive/folders/1qsXW8bmyP2p1levomzZ7WkfVEm9y_yeb?usp=sharing 
+
+    - Evaluation scripts - Inside evaluation folder here: https://github.com/M00d3h/Capstone-LLaVA-Task2 
+
