@@ -12,7 +12,7 @@ import { notFound } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDate } from "@/lib/utils";
 import Image from "next/image";
-import {BackButton} from "@/components/backbutton";
+import BackButton from "@/components/backbutton";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
