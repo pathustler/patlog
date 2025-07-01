@@ -1,0 +1,180 @@
+---
+title: "Order Wizard - OSAAT Part 4"
+description: "Development of one of the most crucial parts of this system – Order Wizard. There are lots of moving parts on this part of the site, and I will discuss them briefly one at a time."
+topic: "Software Development"
+project: "☀️ One shade at a time (OSAAT)"
+date: 01-03-2025
+authors:
+  - avatar: "https://avatars.githubusercontent.com/u/128213324?v=4"
+    handle: pathustler
+    username: Me
+    handleUrl: "https://github.com/pathustler"
+
+    
+cover: "https://stagmoney.com/wp-content/uploads/2025/06/4.png"
+---
+
+
+This is the fourth part of the eight-part series documented on the web app project I undertook – OSAAT. In the previous posts, I gave a brief introduction of the project, along with how we communicated, researched and kicked off the site development. The second part contained a thorough walkthrough of the development of the [login page and its authentication](https://stagmoney.com/deployment-authentication-and-dashboard/). And in the third part, I went through how I built all the [Customer pages](https://stagmoney.com/customer-pages/).
+
+In this part, I will talk about how I went about the development of one of the most crucial parts of this system – Order Wizard. There are lots of moving parts on this part of the site, and I will discuss them briefly one at a time. This post also includes one of the tabs in the customer page that we didn’t talk about in the previous part, as it relied heavily on Orders and Units, which we will talk about today.
+
+First, we will take a look at the models that were created. The order entry process is pretty unusual compared to e-commerce sites you will run into, so I thought it was best I spend some time today explaining that. After that, I’ll move on to showing you how I built each one of those pages, before wrapping it all up with the customer page’s orders tab that we saved for later.
+
+## 🎨 UI DESIGN MOCKUPS
+
+
+| |  |
+| ---------- | ------ |
+![](https://stagmoney.com/wp-content/uploads/2025/02/Screenshot-2025-02-21-at-11.13.35%E2%80%AFPM-2048x1231.png) <center>*Order Entry mockup given to me by OSAAT*</center> | ![](https://stagmoney.com/wp-content/uploads/2025/02/Screenshot-2025-02-21-at-11.14.16%E2%80%AFPM-2048x1231.png) <center>*Order Summary mockup given to me by OSAAT*</center> |
+![](https://stagmoney.com/wp-content/uploads/2025/02/Screenshot-2025-02-21-at-10.58.55%E2%80%AFPM-2048x1235.png) <center>*Order Summary page mockup given to me by OSAAT*</center> | ![](https://stagmoney.com/wp-content/uploads/2025/02/Screenshot-2025-02-21-at-10.59.43%E2%80%AFPM-645x500.png) <center>*Order Confirmation mockup given to me by OSAAT*</center> |
+![](https://stagmoney.com/wp-content/uploads/2025/02/Screenshot-2025-02-21-at-11.02.29%E2%80%AFPM-1024x615.png) <center>*Order confirmation mockup given to me by OSAAT*</center> | ![](https://stagmoney.com/wp-content/uploads/2025/02/Screenshot-2025-02-21-at-11.02.54%E2%80%AFPM-1024x615.png) <center>*Order info mockup given to me by OSAAT*</center> |
+![](https://stagmoney.com/wp-content/uploads/2025/02/Screenshot-2025-02-21-at-11.09.20%E2%80%AFPM-1024x615.png) <center>*Orders tab mockup given to me by OSAAT*</center> | ![](https://stagmoney.com/wp-content/uploads/2025/02/Screenshot-2025-02-21-at-11.06.52%E2%80%AFPM-1024x615.png) <center>*Pending orders tab mockup given to me by OSAAT*</center> |
+
+The first 6 mockups I’ve attached are about the order wizard page we will talk about in a bit. The last 2 images belong to the customer page’s order tab we will discuss at the end of this post. Anyway, I thought it was a good idea to add the UI mockup designs that were given to me as a reference to build the pages, in this section, to give a general sense about what we are looking at. Of course, the end result is not identical to the mockup as some parts were improvised to fit the client’s needs as I worked.
+
+## ⚙️ FEATURES
+
+Before we get into the features that are involved everything that was built here, let me take some time in walking you through how exactly the order placement process works in OSAAT.
+
+![](https://stagmoney.com/wp-content/uploads/2025/06/image.png)
+
+| Feature | Description |
+| ---------- | ------ |
+| Order Wizard | |
+| Order Entry Page | ![](https://stagmoney.com/wp-content/uploads/2025/02/Screenshot-2025-02-21-at-11.13.35%E2%80%AFPM-1024x615.png) The first step of the order wizard process is when you click on “New Order” anywhere. This page is split into two sections, the details for the order and details for the units (an order can have multiple units). <br/> <br/> Once everything is entered, you click on “Continue”, which validates the details and takes you to the next step of the process.|
+| Order Summary (For Dealers) | ![](https://stagmoney.com/wp-content/uploads/2025/02/Screenshot-2025-02-21-at-11.13.35%E2%80%AFPM-1024x615.png) The first step of the order wizard process is when you click on “New Order” anywhere. This page is split into two sections: the details for the order and the details for the units (an order can have multiple units). <br/> <br/> Once everything is entered, you click on “Continue”, which validates the details and takes you to the next step of the process. |
+| Order Confirmation Page (For Admins) | ![](https://stagmoney.com/wp-content/uploads/2025/06/Screenshot-2025-06-23-at-2.50.55%E2%80%AFPM-768x593.png) The order confirmation page contains all the details for the order, along with the cost for all the order items fetched from the database. Here, the admin can generate the order confirmation PDF by clicking the “Generate PDF” button (this button was not available on the mockup since it was a feature that was requested later in the project).|
+| Order Info Page | ![](https://stagmoney.com/wp-content/uploads/2025/06/Screenshot-2025-06-23-at-3.05.29%E2%80%AFPM-768x464.png) When an order is finalised (after the signed order confirmation PDF is uploaded by the admin), the order info page becomes available for that order at /customer/\<int:customer_id>/order/\<int:order_id>, where the details about the order can be viewed. <br/> <br/> The order info page also contains the tracking ID and shipping details that can be updated by the admin later down the road while handling the order.| 
+| Customer Page Orders Tab| |
+| Finalized Orders | ![](https://stagmoney.com/wp-content/uploads/2025/06/Screenshot-2025-06-23-at-3.12.26%E2%80%AFPM-768x464.png) The “Previous Orders” tab contains all the folders of finalised orders related to the customer. These folders are sorted into foldersby the year they were created, and clicking on an order’s PO number shows all the PDF files under the order, which include Order confirmation signed and unsigned. These files are being stored in an Amazon S3 Wasabi bucket and are securely displayed based on the access permission for the customer. | 
+| Pending Orders | ![](https://stagmoney.com/wp-content/uploads/2025/06/Screenshot-2025-06-23-at-3.32.25%E2%80%AFPM-768x464.png) Under the “Pending Orders” tab, all the orders that are yet to be finalised are shown as buttons, linking to the order confirmation page. If the button is orange, it means the reviewed order is available for the customer to finalise. If the button is blue, it means the order is yet to be reviewed by the company. |
+| Quoted Orders | On the order confirmation page, the customer can quote an order when it’s not finalised. These orders can be viewed under the “Quotes” tab. |
+
+
+## 🧙‍♂️ ORDER WIZARD
+
+![](https://stagmoney.com/wp-content/uploads/2025/06/Screenshot-2025-06-25-at-2.42.54%E2%80%AFPM-2048x1163.png)
+
+Based on the user’s role (Admin or Customer) they can create an order from either the dashboard or by clicking on the “New Order” button inside the customer’s info page.
+
+### Order Entry page
+The order entry page would be the first page that appears after clicking on “New Order” from the homescreen as a customer, or the “New Order” button on the customer’s info page as an admin.
+
+![](https://stagmoney.com/wp-content/uploads/2025/06/Screenshot-2025-06-30-at-6.44.48%E2%80%AFPM-2048x1158.png)
+
+The customer’s details are automatically filled in the Order details. Each order can have 1 or more Units in it. The cost of a unit is determined by the product type, along with width and drop. Remotes and accessories come under additional costs, and a unit can have multiple remotes or accessories. Pile brush also adds to the cost.
+
+![](https://stagmoney.com/wp-content/uploads/2025/06/Screenshot-2025-06-30-at-6.51.29%E2%80%AFPM.png)
+
+**Product Type** – There are 10 product types, each product type has 3 parts. The first part usually determines the size of the sunshade unit – STD (Standard), HD (Heavy Duty), DLX (Deluxe), XL (Extra Large). STD units have the smallest frames, HD units have bigger frames, and XL units have the biggest frames. HD products above a certain size automatically become DLX.
+
+The second part states if the sunshade is an FRT (Fabric Retention Shade) or a CGU (Cable Guided Unit). The “Motor Type” options depend on whether the unit is an FRT or a CGU.
+
+The third and last part of the product type string refers to the presence of a box. If the product is BOX, it contains a box; if it’s EXP, it’s exposed, meaning there isn’t a box. Depending on this, some fabric colours are available for the product and some aren’t.
+
+**Width and Drop** – Determines the unit’s cost
+
+**Handing** – It’s either left or right and is reflected on the production workstation to help production workstation workers go with the appropriate handing when manufacturing the sunshade
+
+**Motor Type** – Helps filter out the available remotes and accessories depending on the motor type selected. The available motor types depend on the product type selected, but they’re always a variation of these 3 types – Premium, Somfy, Helios (Solar powered).
+
+![](https://stagmoney.com/wp-content/uploads/2025/06/Screenshot-2025-06-30-at-7.17.10%E2%80%AFPM.png)
+
+**Remotes and Accessories** – Each remote or accessory has its own additional cost, and there is no limit to the number of remotes or accessories a unit can have. A unit can also have two of the same remote/accessory.
+
+**Hardware Colour, Box Colour, Mounting, Pilebrush** – They are not very important in dictating the cost of the unit. They appear on the order PDF and on the appropriate workstation (Box cut/ Hardware/ Assembly). These fields will make sense once I cover them in the 6th part of this 8-part documentation series.
+
+**Manual/ Automatic Checkbox** – This checkbox is unchecked by default on top of each unit form. But when checked, the motor type and remote type fields are removed, and instead replaced with Hand brace, Cable mount and cable size.
+
+**Hand Brace, Cable mount, Cable size** – Also reflected on the workstation pages and not very important in calculating the price of the unit.
+
+**Order Notes** – Optional field at the end of the unit’s form, where any additional notes can be added by the user who places the order.
+
+### Order Confirmation page – Admin Only
+
+![](https://stagmoney.com/wp-content/uploads/2025/06/Screenshot-2025-06-30-at-7.40.28%E2%80%AFPM-2048x1161.png)
+
+When the order entry page is being used by the admin, it usually means the order is being placed by the admin on behalf of the customer. Generating a confirmation PDF would capture the order details and unit details and generate a PDF. This generated PDF would be available for download, and is also saved in the Wasabi S3 bucket, which can be accessed by the user as well as the admin from the customer page anytime. Outside the system, this is where the company mails the unsigned order confirmation PDF to the customer (this can be automated, but my client preferred it this way for certain reasons). The signed PDF from the customer is then received by the admin and uploaded to the system.
+
+Uploading the signed PDF to the system automatically saves it in the same location as the unsigned PDF and makes it accessible to the customer as well as the admin, and the order is successfully placed.
+
+### Order Summary page – Customers and Admins
+
+![](https://stagmoney.com/wp-content/uploads/2025/06/Screenshot-2025-06-30-at-7.34.10%E2%80%AFPM-2048x1161.png)
+
+Orders placed by customers can be accessed by the admins from the customer page. These orders have a pending Review tag and can be reviewed by the admin. On clicking the “Check Reviewed” button, the order becomes “Staff Reviewed”.
+
+![](https://stagmoney.com/wp-content/uploads/2025/06/Screenshot-2025-06-30-at-7.35.38%E2%80%AFPM-2048x1161.png)
+
+Staff-reviewed orders can be viewed as orange buttons on the customer page by the customer. Only the customer can get in and either place the staff-reviewed order or delete it.
+
+### Order Info page
+
+![](https://stagmoney.com/wp-content/uploads/2025/06/Screenshot-2025-06-30-at-8.00.09%E2%80%AFPM-2048x1161.png)
+
+When an order is placed, the information can be viewed on the order info page for the order. This page contains 3 cards and an activity log tab the records all the events taken place related to the order.
+
+First card contains basic order details along with customer name, address and phone number. The second card contains a mini-file browser with the signed and unsigned order confirmation PDF.
+
+![](https://stagmoney.com/wp-content/uploads/2025/06/Screenshot-2025-06-30-at-8.06.00%E2%80%AFPM-1024x652.png)
+
+The second card contains a field where only an admin can add production notes to workstations (each workstation type can have 1 note, which can be edited). The workstation notes will be available on the production workstation to the workers when working on this order.
+
+![](https://stagmoney.com/wp-content/uploads/2025/06/Screenshot-2025-06-30-at-8.07.38%E2%80%AFPM.png)
+
+The second card also contains an area where the admin can set the shipped date, the shipped units and the tracking ID. This is purely for the sake of providing order information to the customer, where the customer can make use of the order info page to keep track of the shipping.
+
+![](https://stagmoney.com/wp-content/uploads/2025/06/Screenshot-2025-06-30-at-8.09.40%E2%80%AFPM.png)
+
+Scrolling down further, we can see the rest of the cards, where each unit has its card with the unit details in it. The “Release for production” button is only available to the admin; releasing for production will make the order available as a job on the production workstation (essentially initiating the manufacturing process).
+
+## 📦 ORDERS TAB ON THE CUSTOMER PAGE
+
+![](https://stagmoney.com/wp-content/uploads/2025/02/Screenshot-2025-02-03-at-8.07.24%E2%80%AFPM.png) <center>*Customer Page Mockup given to me by OSAAT*</center>
+
+This is a fairly complicated page with lots of different things going on. Not only that, but one of the features of this tab wasn’t included in the original design and therefore had to be improvised. For this reason, in the table below, I will address everything that’s going on on this page and give you a brief walkthrough on how it works.
+
+### Embedded File browser
+
+![](https://stagmoney.com/wp-content/uploads/2025/02/Screenshot-2025-02-09-at-8.23.49%E2%80%AFPM-2048x1162.png) <center>*“Previous orders” tab in the Customer Page I built*</center>
+
+A button that opens up a popup that contains a form that allows the user to create a calendar event (for now, it is going to be an empty popup, but once the calendar pages are created, we will work on this popup)
+
+### Pending orders
+
+![](https://stagmoney.com/wp-content/uploads/2025/02/Screenshot-2025-02-09-at-8.25.40%E2%80%AFPM-2048x1162.png) <center>*“Pending” tab in the Customer Page I built*</center>
+
+A tab beside the “New Order” button that allows the users to view all the orders that have ```finalised = False``` or ```reviewed = False```.
+
+The ones with ```finalised = False``` will be displayed in yellow, and the ones with ```reviewed = False``` will be displayed in blue.
+
+### Quoted Orders
+
+![](https://stagmoney.com/wp-content/uploads/2025/02/Screenshot-2025-02-09-at-8.25.58%E2%80%AFPM-2048x1162.png) <center>*“Quotes” tab in the Customer Page I built*</center>
+
+A button that opens up a popup that contains a form that allows the user to create a calendar event (for now, it is going to be an empty popup, but once the calendar pages are created, we will work on this popup).
+
+### View Orders Page – Customers Only
+
+![](https://stagmoney.com/wp-content/uploads/2025/06/Screenshot-2025-06-30-at-8.13.04%E2%80%AFPM-2048x1156.png)
+
+From the customer dashboard, a customer can access the view orders page where all the orders related to the customer, along with pending and quotes, are sorted and shown based on the year and month the order was placed. Clicking on the button will take the customer to the order summary page for that order. Jobs can also be searched based on the job number (the 7-digit unit number for each order).
+
+## 🔮 NEXT STEPS
+
+This post is the fourth part of the whole project documentation series. In the next article, I will go through the Calendar pages, about working on schedules and how the admins interact with them. Feel free to use the links below to read about any part of the project you are interested in. I’ll see you on the next post!
+
+
+1. Meetings and Project Kickoff – https://stagmoney.com/meetings-and-project-kickoff-osaat-part-1/
+2. Deployment, Authentication and Dashboard – https://stagmoney.com/deployment-authentication-and-dashboard/
+3. Customer Page – https://stagmoney.com/customer-pages/
+4. Order Wizard – **Current Post**
+5. Calendar – *Upcoming*
+6. Workstation – *Upcoming*
+7. Map Navigation – *Upcoming*
+8. Minor Features – *Upcoming*
+
+
+
+
