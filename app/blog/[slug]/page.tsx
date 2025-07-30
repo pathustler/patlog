@@ -19,14 +19,43 @@ type PageProps = {
 };
 
 export async function generateMetadata(props: PageProps) {
-  const params = await props.params;
+ const params = await props.params;
   const { slug } = params;
   const res = await getBlogFrontmatter(slug);
+
   if (!res) return {};
-  const { title, description } = res;
+
+  const { title, description, cover } = res;
+
+  const baseUrl = "https://patlog.vercel.app";
+
+  const ogImage = cover?.startsWith("http")
+    ? cover
+    : `${baseUrl}${cover.startsWith("/") ? "" : "/"}${cover}`;
+
   return {
     title,
     description,
+    openGraph: {
+      title,
+      description,
+      type: "article",
+      url: `${baseUrl}/blog/${slug}`,
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage],
+    },
   };
 }
 
