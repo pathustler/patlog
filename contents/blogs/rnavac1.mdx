@@ -1,0 +1,174 @@
+---
+title: "Biomedical data mining Multi-Agent System"
+description: "This article describes a practical, end-to-end system that automates biomedical data mining for RNA vaccine design using a hierarchical multi-agent LLM architecture, automated PDF ingestion, and targeted entity extraction (genes, proteins, RNAs)"
+topic: "ML Development"
+project: "🧬 Knowledge Extraction Platform for Accelerated RNA Vaccine Design"
+date: 20-08-2025
+authors:
+  - avatar: "https://avatars.githubusercontent.com/u/128213324?v=4"
+    handle: pathustler
+    username: Me
+    handleUrl: "https://github.com/pathustler"
+
+    
+cover: "/covers/rnavac1.jpg"
+---
+
+## System Overview
+
+The RNA Vaccine Design Data Source Integration implements an end-to-end pipeline for retrieving PubMed articles on topics like CRISPR, extracting metadata and abstracts via NCBI Entrez APIs, acquiring PDF links with open-access prioritization, processing PDFs into page-aware text chunks, and extracting biomedical entities (genes, proteins, RNAs) using regex pre-filtering and LLM-based prompts with strict verbatim extraction rules. This Jupyter notebook-based system respects API rate limits implicitly through request handling and focuses on downloadable content, outputting structured DataFrames and JSON for downstream vaccine design analysis. It integrates libraries like requests, BeautifulSoup, PyMuPDF, and OpenAI for robust, automated knowledge extraction from scientific literature.
+
+
+## Retrieval and Metadata Extraction (NCBI Entrez)
+
+![Figure 1:  Biomedical data mining Multi-Agent System pipeline. ](/blogs/ml/rnavac1/1.png)
+
+- Use Entrez esearch to find PMIDs for a disease or mechanism keyword set. Example parameters: db=pubmed, term="SARS-CoV-2 AND spike", retmode=json, usehistory=y, retmax=150.
+
+- Use esummary and efetch to obtain metadata and XML abstracts.
+
+- Save articleids (PMCID, DOI, pubmed) to map to PDF acquisition.
+
+The pipeline begins with querying PubMed using NCBI's ESearch endpoint to fetch up to 150 article IDs based on keywords like "CRISPR". Parameters include db="pubmed", term='"CRISPR"*', retmax=150, retmode="json", usehistory="y", and an optional API key for higher rate limits (up to 10 requests/second with key, 3 without). Next, ESummary retrieves metadata such as titles, authors, and DOIs for the ID list. Abstracts are fetched via EFetch in XML mode, parsed with ElementTree to extract structured content: titles from ArticleTitle, full abstracts by concatenating AbstractText nodes (labeling sections like "conclusion" if present), and conclusions specifically. This produces a list of dictionaries per article, handling cases with no abstract by setting None values.​
+
+
+## PDF Acquisition Logic
+
+![](/blogs/ml/rnavac1/2.png)
+
+For each article:
+
+- If PMCID present → use https://www.ncbi.nlm.nih.gov/pmc/articles/PMCxxxx/pdf.
+
+- Else, resolve DOI. Query Unpaywall API to check for OA PDF (best_oa_location.url_for_pdf).
+
+- If still missing, fetch publisher landing page and scrape for obvious “Download PDF” anchors or direct .pdf links.
+
+- Track whether the PDF is downloadable; if not, retain the DOI/landing URL for metadata extraction from abstract.
+
+For each article ID, the system maps identifiers (PMCID, PubMed ID, DOI) and prioritizes PDF sources: if PMCID exists, it constructs a direct PMC PDF URL like "https://www.ncbi.nlm.nih.gov/pmc/articles/{PMCID}/pdf". Otherwise, it resolves the DOI via ESummary's elocationid (stripping "doi:" prefix), then queries Unpaywall API (e.g., "https://api.unpaywall.org/v2/{DOI}?email=...") to get the best_oa_location.url_for_pdf if available. As fallback, it scrapes the DOI landing page ("https://doi.org/{DOI}") with BeautifulSoup, searching for anchors/buttons containing "pdf" or "view pdf" (using User-Agent headers to mimic a browser), or direct .pdf hrefs. Outcomes are flagged as downloadable (True/False) with error handling for `Forbidden/Not Found`, ensuring compliance with open-access policies and avoiding paywall redistribution.​
+
+## PDF Processing and Chunking
+
+![](/blogs/ml/rnavac1/4.png)
+
+- Use PyMuPDF (fitz) to extract page-level text. If PDF is image-based, use Tesseract OCR.
+
+- Preprocess text:
+
+    - Remove zero-width and unusual characters, normalize whitespace,
+
+    - Convert pages into labeled chunks: [Page no. X] " … chunk text … ".
+
+    - Chunking strategy: ~150 words per chunk (configurable), preserve page boundaries so provenance is exact.
+
+Upon loading the CSV, the system targets downloadable PDFs (`np.array(df.iloc[:,5])` for isdownloadable flags). PyMuPDF (fitz) opens PDFs, handling remote URLs by downloading to `'temp.pdf'` via urllib. Text extraction iterates pages (default start=1 to end), applying preprocess: replaces newlines/whitespace, removes non-ASCII via safe_utf8 (stripping soft hyphens and non-printables), and normalizes UTF-8. text_to_chunks splits into ~150-word segments, preserving page boundaries with labels like `'[Page no. X] "chunk text"'` and merging overflow to next chunk if under length. Optional biomedical filtering uses regex for terms like gene/protein/RNA or `[ACGU]{5,}` patterns, though commented out in core flow. 
+
+## Multi-agent LLM Entity Extraction Pipeline
+
+![](/blogs/ml/rnavac1/3.png)
+
+
+**Design pattern**: use a hierarchical flow with a manager agent assigning the job to multiple PDF reader agents.
+
+Chunks feed into LLM extraction via generate_answer, first collecting RNA candidates with regex `\b[\w/-]*RNA\b` for prompt hints. The prompt instructs a biomedical expert to extract verbatim genes, proteins, and RNAs from chunks, grouping as Gene/Protein/RNA Information with bullet points of names and exact snippets; rules emphasize "DO NOT infer" and handle none-found cases. OpenAI's GPT-4o (temperature=0.0, max_tokens=512) generates the response, parsed with Pydantic BioEntities model (lists for gene/protein/rna) using regex to pull bullet names from blocks. Output is JSON-dumped (e.g., `{"gene": [...], "protein": [...], "rna": []}`) for structured use. This hierarchical approach—regex hints + strict LLM + model validation—minimizes hallucinations while capturing explicit mentions like "Clu" or "Mfn2" with provenance.​
+
+**Prompt engineering specifics used in practice:**
+
+1. Provide clear examples from the PDF to prevent hallucinations.
+
+2. Include a short list of desired output schema (JSON list of entries).
+
+3. Supply candidate matches (regex found in text) as hints to reduce search space.
+
+4. Force the model to quote snippets verbatim and attach exact page numbers.
+
+
+## Example outputs
+
+**Human readable snippet (from a single chunk) extracted by the LLM**
+`"Clu promotes mitochondrial hyperfusion by interacting with Mfn2 in aged HSCs."`
+
+**Extracted JSON**
+
+```json
+{
+  "gene": [
+    {"name":"Clu","snippet":"we uncovered clusterin (Clu) as a driver of biased differentiation.","doi":"10.XXXX","page":3}
+  ],
+  "protein": [
+    {"name":"Mfn2","snippet":"Clu promotes mitochondrial hyperfusion by interacting with Mfn2","doi":"10.XXXX","page":3}
+  ],
+  "rna": []
+}
+```
+
+**Final Result for the single chunk**
+
+```json
+{
+  "gene": [
+    "Clu"
+  ],
+  "protein": [
+    "Mfn2"
+  ],
+  "rna": []
+}
+```
+
+
+**Example aggregated output after parallel processing of 130 articles**
+
+```json
+{
+  "gene": [
+    "Clu",
+    "p53",
+    "Bax",
+    "Bak",
+    "Pgc-1α",
+    "Nrf1",
+    "Tfam",
+    "Drp1",
+    "Fis1"
+  ],
+  "protein": [
+    "Mfn2",
+    "p53",
+    "Bax",
+    "Bak",
+    "Pgc-1α",
+    "Nrf1",
+    "Tfam",
+    "Drp1",
+    "Fis1"
+  ],
+  "rna": [
+    "mRNA",
+    "siRNA",
+    "miRNA"
+  ]
+}
+```
+
+## Challenges & mitigation strategies
+
+1. **PDF acquisition & paywalls** - Unpaywall and PMC cover many OA papers; for paywalled content, metadata and abstract extraction still provide partial value.
+
+2. **Scanned PDFs and Figures** - Need OCR and table parsing tools to capture sequences in images.
+
+3. **LLM hallucination** - LLMs can invent sequences or attributions. Mitigation used: Rule enforcement in prompts (“only extract verbatim”). Post-validation by regex and external DB lookups.
+
+4. **Entity normalization** - Synonyms, aliases and species ambiguity require cross-referencing against UniProt/NCBI Gene, planned for future. 
+
+5. **RNA entities extracted is tricky** - RNAs have diverse nomenclature because of which careful prompt design and regex pre-filtering is needed to capture relevant mentions.
+
+
+## What the final product looks like for a user
+
+A researcher types a disease or protein keyword and clicks “Run”.
+
+The system returns a list of top 150 articles from NCBI Entrez API. The pipeline parallely processes multiple PDFs using a multi-agent system to extract top antigen candidates, sequences (if available), confidence scores, and links to source documents (DOI, page, snippet).
+
+Full JSON and CSV exports are available for downstream analyses (sequence alignment, epitope prediction pipelines, or experimental planning).
