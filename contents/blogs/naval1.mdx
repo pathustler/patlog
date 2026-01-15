@@ -1,0 +1,54 @@
+---
+title: "Time-Series Anomaly Detection and RUL Estimation using GMM, Autoencoders, and a ReAct Loop"
+description: "A pipeline that detects anomalies and estimates RUL from multivariate time-series signals using GMMs and Autoencoders, Ollama Multiagent System, enhanced with a ReAct loop to orchestrate tool execution and produce traceable, iterative reasoning for actionable maintenance insights."
+topic: "ML Development"
+project: "🚢 Naval Ship Maintenance (GMM + Autoencoder + LLMs + ReAct Loop) Vaccine Design"
+date: 08-01-2026
+authors:
+  - avatar: "https://avatars.githubusercontent.com/u/128213324?v=4"
+    handle: pathustler
+    username: Me
+    handleUrl: "https://github.com/pathustler"
+
+    
+cover: "/covers/naval1.png"
+---
+
+
+## Introduction
+In this blog post, we explore a comprehensive pipeline for time-series anomaly detection and Remaining Useful Life (RUL) estimation using a combination of Gaussian Mixture Models (GMMs), Autoencoders, and a ReAct loop powered by Large Language Models (LLMs). This approach is particularly relevant for predictive maintenance in naval ship systems, where early detection of anomalies and accurate RUL estimation can significantly enhance operational efficiency and safety.
+
+
+## RUL Estimation with Gaussian Mixture Models (GMMs)
+
+RUL estimation is a critical aspect of predictive maintenance, allowing for the anticipation of equipment failures before they occur. GMMs are probabilistic models that assume data points are generated from a mixture of several Gaussian distributions. They are particularly effective in modeling the underlying distribution of time-series data.
+
+After building and training the model, we could now see here that the model is able to predict the RUL of the test data with a reasonable accuracy. The image below can provide insights into the model's performance.
+
+![RUL Estimation Performance](/blogs/ml/naval1/1.png)
+
+
+
+## Anomaly Detection with LSTM Autoencoders
+
+LSTM Autoencoders are a type of neural network architecture that combines Long Short-Term Memory (LSTM) networks with Autoencoders. They are particularly well-suited for time-series data due to their ability to capture temporal dependencies.
+
+![Anomaly Detection Performance](/blogs/ml/naval1/3.png)
+
+Here, we trained an LSTM Autoencoder on the normal operational data of the naval ship systems. The model learns to reconstruct the input time-series data, and anomalies are detected based on reconstruction errors. High reconstruction errors indicate deviations from normal behavior, signaling potential anomalies.
+
+![Anomaly Detection Performance](/blogs/ml/naval1/2.png)
+
+
+## Testing the RUL Estimation and Anomaly Detection Pipeline
+
+![Anomaly Detection Performance](/blogs/ml/naval1/4.png)
+
+## ReAct Loop for Enhanced Decision-Making
+
+To further enhance the decision-making process, we integrated a ReAct loop using an Ollama Multiagent System. Depending on the RUL and anomaly scores, the MAS adopts different roles to provide actionable insights, creating a dynamic and responsive maintenance strategy.
+
+![ReAct Loop Decision-Making](/blogs/ml/naval1/5.png)
+
+
+

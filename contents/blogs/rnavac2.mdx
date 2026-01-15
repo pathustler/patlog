@@ -1,0 +1,52 @@
+---
+title: "Coscientist Frontend Interface for Knowledge Extraction"
+description: "This article focuses on the frontend interface integrated with a hierarchical multi-agent LLM pipeline to enable real-world biomedical knowledge extraction (PDF ingestion, workflow execution, and targeted entity extraction for RNA vaccine design)."
+topic: "ML Development"
+project: "🧬 Knowledge Extraction Platform for Accelerated RNA Vaccine Design"
+date: "14-11-2025"
+authors:
+  - avatar: "https://avatars.githubusercontent.com/u/128213324?v=4"
+    handle: "pathustler"
+    username: "Me"
+    handleUrl: "https://github.com/pathustler"
+cover: "/covers/rnavac2.jpg"
+---
+
+
+## Frontend Interface Overview
+
+The Coscientist Frontend Interface serves as the user-facing component of the biomedical knowledge extraction system, providing an intuitive platform for researchers to interact with the hierarchical multi-agent LLM pipeline. This interface allows users to search for a specific biomedical topic, initiate data retrieval and processing workflows, and visualize extracted entities such as genes, proteins, and RNAs from scientific literature.
+
+
+## Searching for Biomedical Topics and fetching articles
+
+
+The user uses the search bar to input a biomedical topic of interest, such as "CRISPR". Upon submission, the frontend sends a request to the backend API, which triggers the hierarchical multi-agent LLM pipeline to begin retrieving relevant PubMed articles, extracting metadata and abstracts, acquiring PDFs, and processing them for entity extraction.
+
+
+![](/blogs/ml/rnavac2/2.png)
+
+
+
+## Using multiagent LLM pipeline to extract entities
+
+Once the articles are retrieved and processed, the frontend interface displays the extracted entities in a structured format. Users can view lists of genes, proteins, and RNAs identified in the literature, along with their associated metadata (e.g., article titles, authors, publication dates). The interface also provides options to filter and sort the extracted data for easier analysis.
+
+![](/blogs/ml/rnavac2/1.png)
+
+
+Extracted entities are presented in a table in real time, allowing users to explore the results of the multi-agent LLM extraction process. 
+
+
+![](/blogs/ml/rnavac2/3.png)
+
+
+## End result
+
+![](/blogs/ml/rnavac2/4.png)
+
+The Coscientist Frontend Interface effectively bridges the gap between complex biomedical data mining processes and end-users, enabling researchers to leverage advanced LLM capabilities for RNA vaccine design. By providing a user-friendly platform for searching, processing, and visualizing biomedical knowledge, the interface enhances accessibility and usability of the underlying multi-agent system.
+
+
+
+🔗 Link to article where I built the multi-agent LLM pipeline: [Biomedical data mining Multi-Agent System](https://patlog.vercel.app/blog/rnavac2)
