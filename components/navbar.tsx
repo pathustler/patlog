@@ -9,6 +9,7 @@ import { page_routes } from "@/lib/routes-config";
 import { SheetClose } from "@/components/ui/sheet";
 import AlgoliaSearch from "./algolia-search";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 
 export const NAVLINKS = [
@@ -46,6 +47,12 @@ const algolia_props = {
 };
 
 export function Navbar() {
+  const pathname = usePathname();
+
+  if (pathname?.startsWith("/pat")) {
+    return null;
+  }
+
   return (
     <nav className="w-full border-b h-16 sticky top-0 z-50 bg-background">
       <div className="sm:container mx-auto w-[95vw] h-full flex items-center sm:justify-between md:gap-2">

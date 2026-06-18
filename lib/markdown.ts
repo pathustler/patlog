@@ -1,6 +1,9 @@
+import "server-only";
+
 import { compileMDX } from "next-mdx-remote/rsc";
 import path from "path";
 import { promises as fs } from "fs";
+import { createClient } from "@supabase/supabase-js";
 import remarkGfm from "remark-gfm";
 import rehypePrism from "rehype-prism-plus";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
@@ -199,53 +202,91 @@ export type BlogMdxFrontmatter = BaseMdxFrontmatter & {
   cover: string;
 };
 
-export async function getAllBlogStaticPaths() {
-  try {
-    const blogFolder = path.join(process.cwd(), "/contents/blogs/");
-    const res = await fs.readdir(blogFolder);
-    return res.map((file) => file.split(".")[0]);
-  } catch (err) {
-    console.log(err);
+type BlogRow = {
+  md_name: string;
+  md_content: string;
+};
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+const blogsTable = "blogs";
+
+function getSupabaseClient() {
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error(
+      "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"
+    );
   }
+
+  return createClient(supabaseUrl, supabaseKey);
+}
+
+function slugFromMdName(mdName: string) {
+  return mdName.replace(/\.mdx?$/i, "");
+}
+
+async function getBlogRows() {
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from(blogsTable)
+    .select("md_name, md_content");
+
+  if (error) {
+    console.log(error);
+    return [] as BlogRow[];
+  }
+
+  return (data ?? []) as BlogRow[];
+}
+
+async function getBlogRowBySlug(slug: string) {
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from(blogsTable)
+    .select("md_name, md_content")
+    .eq("md_name", slug)
+    .maybeSingle();
+
+  if (error) {
+    console.log(error);
+    return undefined;
+  }
+
+  return data as BlogRow | null;
+}
+
+export async function getAllBlogStaticPaths() {
+  const rows = await getBlogRows();
+  return rows.map((row) => slugFromMdName(row.md_name));
 } 
 
 export async function getAllBlogsFrontmatter() {
-  const blogFolder = path.join(process.cwd(), "/contents/blogs/");
-  const files = await fs.readdir(blogFolder);
-  const uncheckedRes = await Promise.all(
-    files.map(async (file) => {
-      if (!file.endsWith(".mdx")) return undefined;
-      const filepath = path.join(process.cwd(), `/contents/blogs/${file}`);
-      const rawMdx = await fs.readFile(filepath, "utf-8");
-      return {
-        ...justGetFrontmatterFromMD<BlogMdxFrontmatter>(rawMdx),
-        slug: file.split(".")[0],
-      };
-    })
-  );
-  return uncheckedRes.filter((it) => !!it) as (BlogMdxFrontmatter & {
-    slug: string;
-  })[];
+  const rows = await getBlogRows();
+
+  return rows.map((row) => ({
+    ...justGetFrontmatterFromMD<BlogMdxFrontmatter>(row.md_content),
+    slug: slugFromMdName(row.md_name),
+  }));
 }
 
 export async function getCompiledBlogForSlug(slug: string) {
-  const blogFile = path.join(process.cwd(), "/contents/blogs/", `${slug}.mdx`);
-  try {
-    const rawMdx = await fs.readFile(blogFile, "utf-8");
-    return await parseMdx<BlogMdxFrontmatter>(rawMdx);
-  } catch {
+  const row = await getBlogRowBySlug(slug);
+
+  if (!row?.md_content) {
     return undefined;
   }
+
+  return await parseMdx<BlogMdxFrontmatter>(row.md_content);
 }
 
 export async function getBlogFrontmatter(slug: string) {
-  const blogFile = path.join(process.cwd(), "/contents/blogs/", `${slug}.mdx`);
-  try {
-    const rawMdx = await fs.readFile(blogFile, "utf-8");
-    return justGetFrontmatterFromMD<BlogMdxFrontmatter>(rawMdx);
-  } catch {
+  const row = await getBlogRowBySlug(slug);
+
+  if (!row?.md_content) {
     return undefined;
   }
+
+  return justGetFrontmatterFromMD<BlogMdxFrontmatter>(row.md_content);
 }
 
 export async function getDocFrontmatter(path: string) {
